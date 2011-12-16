@@ -1,0 +1,12 @@
+name: TheNeedfuls
+
+main: org.selurgniman.bukkit.theneedfuls.TheNeedfuls
+
+version: 0.1
+
+database: false
+
+commands:
+    theneedfuls:
+        description: none
+        usage: /theneedfuls
