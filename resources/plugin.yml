@@ -1,12 +1,71 @@
 name: TheNeedfuls
-
-main: org.selurgniman.bukkit.theneedfuls.TheNeedfuls
-
 version: 0.1
+author: Selurgniman
+main: org.selurgniman.bukkit.theneedfuls.TheNeedfuls
 
 database: false
 
 commands:
-    theneedfuls:
-        description: none
-        usage: /theneedfuls
+    tnh:
+        description: Get help with TheNeedfuls.
+        permission: theneedfuls.help
+        usage:  |
+            /<command> help [torch|ice] [option]
+    tnt:
+        description: Set TheNeedfuls torch options.
+        permission: theneedfuls.torch
+        usage:  |
+            /<command> [age|refresh|count|expire|worlds] [options]
+            Example: /<command> age 300 - set the maximum torch age to 300 seconds.
+            Example: /<command> refresh 30 - set the torch expiration check to every 30 seconds.
+            Example: /<command> count - see how many torches are being tracked.
+            Example: /<command> expire - expire all torches being tracked.
+            Example: /<command> worlds - see a list of worlds that torch expiration is enabled on.
+            Example: /<command> worlds add world - enable torch expiration on world named "world".
+            Example: /<command> worlds remove world - disable torch expiration on world named "world".
+    tni:
+        description: Set TheNeedfuls ice options.
+        permission: theneedfuls.ice
+        usage:  |
+            /<command> [quantity] [1-64]
+            Example: /<command> quantity 32 - set the stack size of the dispensed ice to 32.
+
+permissions:
+    theneedfuls.*:
+        description: Gives access to all TheNeedfuls commands.
+        default: op
+        children:
+            theneedfuls.torch.*: true
+            theneedfuls.ice.*: true
+    theneedfuls.torch.*:
+        description: Gives access to all TheNeedfuls torch commands.
+        default: op
+        children:
+            theneedfuls.torch.age: true
+            theneedfuls.torch.refresh: true
+            theneedfuls.torch.count: true
+            theneedfuls.torch.expire: true
+            theneedfuls.torch.worlds: true
+    theneedfuls.ice.*:
+        description: Gives access to all TheNeedfuls ice commands.
+        default: op
+        children:
+            theneedfuls.ice.quantity: true
+    theneedfuls.torch.age:
+        description: Allows you to set the maximum age for torches.
+        default: op
+    theneedfuls.torch.refresh:
+        description: Allows you to set the torch expiration check frequency.
+        default: op
+    theneedfuls.torch.count:
+        description: Allows you to list the number of torches being tracked.
+        default: true
+    theneedfuls.torch.expire:
+        description: Allows you to expire all of the torches being tracked.
+        default: op
+    theneedfuls.torch.worlds:
+        description: Allows you to set the worlds which torch expiration is enabled.
+        default: op
+    theneedfuls.ice.quantity:
+        description: Allows you to set the stack size for the ice being dispensed.
+        default: op

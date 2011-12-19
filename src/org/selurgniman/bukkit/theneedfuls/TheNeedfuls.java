@@ -3,39 +3,47 @@
  */
 package org.selurgniman.bukkit.theneedfuls;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerListener;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.selurgniman.bukkit.theneedfuls.commands.HelpCommand;
+import org.selurgniman.bukkit.theneedfuls.commands.IceCommand;
+import org.selurgniman.bukkit.theneedfuls.commands.TorchCommand;
+import org.selurgniman.bukkit.theneedfuls.listeners.TheNeedfulsBlockListener;
+import org.selurgniman.bukkit.theneedfuls.listeners.TheNeedfulsEntityListener;
+import org.selurgniman.bukkit.theneedfuls.model.Model;
+import org.selurgniman.bukkit.theneedfuls.model.Torch;
 
 import com.avaje.ebean.EbeanServer;
 
 /**
- * @author <a href="mailto:e83800@wnco.com">Chris Bandy</a> Created on: Dec 15,
- *         2011
+ * @author <a href="mailto:selurgniman@selurgniman.org">Selurgniman</a> Created
+ *         on: Dec 18, 2011
  */
 public class TheNeedfuls extends JavaPlugin {
 	private final Logger log = Logger.getLogger("Minecraft");
-	private static final MemoryConfiguration CONFIG_DEFAULTS = new MemoryConfiguration();
+	private static final HashMap<String, Object> CONFIG_DEFAULTS = new HashMap<String, Object>();
 	private Model model = null;
+	private int torchTaskId = -1;
 
 	static {
-		CONFIG_DEFAULTS.addDefault("torchAge", 120);
+		CONFIG_DEFAULTS.put("iceMaker.quantity", 64);
+		CONFIG_DEFAULTS.put(Torch.TORCH_REFRESH_KEY, 30);
+		CONFIG_DEFAULTS.put(Torch.TORCH_AGE_KEY, 300);
+		CONFIG_DEFAULTS.put(Torch.TORCH_WORLDS_KEY, Collections.EMPTY_LIST);
 		for (Entry<String, Message> entry : Message.values()) {
-			CONFIG_DEFAULTS.addDefault(entry.getKey(), entry.getValue().toString());
+			CONFIG_DEFAULTS.put(entry.getKey(), entry.getValue().toString());
 		}
 	}
 
@@ -47,29 +55,37 @@ public class TheNeedfuls extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		this.getConfig().setDefaults(CONFIG_DEFAULTS);
+		try {
+			this.getDataFolder().createNewFile();
+		} catch (IOException e) {
+			log.log(Level.SEVERE, e.getMessage());
+		}
+		for (Entry<String,Object>entry:CONFIG_DEFAULTS.entrySet()){
+			if(this.getConfig().get(entry.getKey()) == null){
+				this.getConfig().set(entry.getKey(), entry.getValue());
+			}
+		}
+		
 		Message.setConfig(this.getConfig());
 
 		this.model = new Model(this);
 		setupDatabase();
 
 		PluginManager pm = getServer().getPluginManager();
-		pm.registerEvent(Event.Type.BLOCK_PLACE, new BlockPlacedListener(model), Priority.Highest, this);
-		pm.registerEvent(Event.Type.PLAYER_INTERACT, new PlayerListener() {
-			@Override
-			public void onPlayerInteract(PlayerInteractEvent event) {
-				Block clickedBlock = event.getClickedBlock();
-				if (event.getMaterial() == Material.WATER_BUCKET && clickedBlock.getType() == Material.IRON_BLOCK
-						&& clickedBlock.getRelative(BlockFace.DOWN).getType() == Material.SNOW_BLOCK) {
-					System.out.println(clickedBlock+":"+clickedBlock.getRelative(BlockFace.UP));
-					event.getPlayer().getWorld().dropItemNaturally(clickedBlock.getRelative(BlockFace.UP).getLocation(), new ItemStack(Material.ICE,1));
-					event.setCancelled(true);
-				}
-			}
-		}, Priority.Highest, this);
+		TheNeedfulsEntityListener entityLlistener = new TheNeedfulsEntityListener(model);
+		TheNeedfulsBlockListener blockLlistener = new TheNeedfulsBlockListener(this);
+		pm.registerEvent(Event.Type.BLOCK_PLACE, blockLlistener, Priority.Highest, this);
+		pm.registerEvent(Event.Type.BLOCK_BREAK, blockLlistener, Priority.Highest, this);
+		pm.registerEvent(Event.Type.BLOCK_DISPENSE, blockLlistener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityLlistener, Priority.Highest, this);
 
-		this.getCommand("theneedfuls").setExecutor(new TheneedfulsCommandExecutor(model));
+		initTorchTask();
 
+		this.getCommand("tnh").setExecutor(new HelpCommand());
+		this.getCommand("tnt").setExecutor(new TorchCommand(this));
+		this.getCommand("tni").setExecutor(new IceCommand(this));
+
+		saveConfig();
 		PluginDescriptionFile pdfFile = this.getDescription();
 		log.info(Message.PREFIX + pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled!");
 	}
@@ -79,9 +95,26 @@ public class TheNeedfuls extends JavaPlugin {
 			model.getDatabase().find(Torch.class).findRowCount();
 
 		} catch (PersistenceException ex) {
-			System.out.println("Installing database for " + getDescription().getName() + " due to first time usage");
+			log.info("Installing database for " + getDescription().getName() + " due to first time usage");
 			installDDL();
 		}
+	}
+
+	public void initTorchTask() {
+		if (-1 != torchTaskId) {
+			this.getServer().getScheduler().cancelTask(torchTaskId);
+		}
+
+		torchTaskId = this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
+			@Override
+			public void run() {
+				model.expireTorches();
+			}
+		}, 60L, this.getConfig().getLong(Torch.TORCH_REFRESH_KEY) * 20);
+	}
+
+	public Model getModel() {
+		return this.model;
 	}
 
 	@Override

@@ -1,9 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.selurgniman</groupId>
-  <artifactId>TheNeedfuls</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <build>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.selurgniman</groupId>
+	<artifactId>TheNeedfuls</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<build>
 		<finalName>TheNeedfuls</finalName>
 		<sourceDirectory>${basedir}/src</sourceDirectory>
 		<resources>
@@ -60,6 +61,33 @@
 								</includes>
 							</artifactSet>
 						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>${groupId}</groupId>
+							<artifactId>${artifactId}</artifactId>
+							<version>${version}</version>
+							<type>jar</type>
+							<overWrite>true</overWrite>
+							<outputDirectory>D:\minecraft_stuff\Minecraft_server\plugins</outputDirectory>
+							<destFileName>${artifactId}.jar</destFileName>
+						</artifactItem>
+					</artifactItems>
+					<!-- other configurations here -->
+				</configuration>
+				<executions>
+					<execution>
+						<id>build</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>

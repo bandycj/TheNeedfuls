@@ -7,7 +7,7 @@
 	<files>
 		<file>
 			<source>${project.build.directory}/${artifactId}.jar</source>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>D:/minecraft_stuff/Minecraft_server/plugins</outputDirectory>
 			<destName>TheNeedfuls.jar</destName>
 		</file>
 	</files>
