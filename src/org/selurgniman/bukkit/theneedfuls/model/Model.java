@@ -16,8 +16,10 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.selurgniman.bukkit.theneedfuls.Message;
 
 import com.avaje.ebean.EbeanServer;
 import com.lennardf1989.bukkitex.MyDatabase;
@@ -66,6 +68,8 @@ public class Model {
 			protected java.util.List<Class<?>> getDatabaseClasses() {
 				List<Class<?>> list = new ArrayList<Class<?>>();
 				list.add(Torch.class);
+				list.add(Credit.class);
+				list.add(Drop.class);
 				return list;
 			};
 		};
@@ -141,6 +145,88 @@ public class Model {
 	public int getTorchCount() {
 		return database.find(Torch.class).findRowCount();
 	}
+	
+	public void useAvailableCredit(Player player) {
+		Credit creditClass = getRecordForPlayer(player);
+		if (getAvailableCredits(player) > 0) {
+			creditClass.setCredits(creditClass.getCredits() - 1);
+			creditClass.setLastCredit(new Date());
+			database.delete(creditClass.getDrops());
+			database.save(creditClass);
+			player.getServer().broadcastMessage(String.format(Message.CREDIT_USED_MESSAGE.toString(), player.getName()));
+		}
+	}
+
+	public int getAvailableCredits(Player player) {
+		Credit creditClass = getRecordForPlayer(player);
+		if (creditClass.getCredits() == 0) {
+			Date lastCreditDate = creditClass.getLastCredit();
+			int duration = (int) ((new Date().getTime() - lastCreditDate.getTime()) / 1000);
+			if (duration >= plugin.getConfig().getInt("frequency", 86400)) {
+				creditClass.setCredits(Integer.parseInt(plugin.getConfig().getString("credits", "1")));
+				database.save(creditClass);
+			}
+		}
+
+		return creditClass.getCredits();
+	}
+	public int getLastExperience(Player player){
+		Credit creditClass = getRecordForPlayer(player);
+		for (Drop drop : creditClass.getDrops()) {
+			if (drop.getItemId() == -2) {
+				return drop.getItemCount();
+			} 
+		}
+		
+		return 0;
+	}
+	public List<ItemStack> getLastInventory(Player player) {
+		Credit creditClass = getRecordForPlayer(player);
+		ArrayList<ItemStack> items = new ArrayList<ItemStack>();
+		for (Drop drop : creditClass.getDrops()) {
+			if (drop.getItemId() != -2) {
+				items.add(new ItemStack(Material.getMaterial(drop.getItemId()), drop.getItemCount(),drop.getItemDurability().shortValue(),drop.getItemData().byteValue()));
+			} 
+		}
+		return items;
+	}
+
+	public void addAvailableCredits(Player player, int count) {
+		setAvailableCredits(player, getAvailableCredits(player) + count);
+	}
+
+	public void setAvailableCredits(Player player, int count) {
+		Credit creditClass = getRecordForPlayer(player);
+		creditClass.setCredits(count);
+
+		database.save(creditClass);
+	}
+
+	public void setLastInventory(Player player, List<ItemStack> itemsList, Integer droppedExp) {
+		Credit creditClass = getRecordForPlayer(player);
+		ArrayList<Drop> drops = new ArrayList<Drop>();
+		Drop drop = new Drop();
+		drop.setItemId(-2);
+		System.out.println("level: "+player.getLevel()+":"+droppedExp);
+		drop.setItemCount(player.getLevel());
+		drop.setItemData(0);
+		drop.setItemDurability(0);
+		drop.setCredit(creditClass);
+		drops.add(drop);
+		
+		for (ItemStack item : itemsList) {
+			Byte data = item.getData().getData();
+			drop = new Drop();
+			drop.setItemId(item.getTypeId());
+			drop.setItemCount(item.getAmount());
+			drop.setItemData(data.intValue());
+			drop.setItemDurability(new Integer(item.getDurability()));
+			drop.setCredit(creditClass);
+			drops.add(drop);
+		}
+
+		database.save(drops);
+	}
 
 	private synchronized void removeTorch(Torch torch) {
 		database.delete(torch);
@@ -170,5 +256,19 @@ public class Model {
 
 	private List<Torch> getTorchesOlderThan(Date date) {
 		return database.find(Torch.class).where().lt("placed_date", date).findList();
+	}
+	
+	private Credit getRecordForPlayer(Player player) {
+		String name = player.getName();
+		Credit creditClass = database.find(Credit.class).where().ieq("playerName", name).findUnique();
+		if (creditClass == null) {
+			creditClass = new Credit();
+			creditClass.setPlayer(player);
+			creditClass.setCredits(plugin.getConfig().getInt("credits", 1));
+			
+			database.save(creditClass);
+		}
+
+		return creditClass;
 	}
 }

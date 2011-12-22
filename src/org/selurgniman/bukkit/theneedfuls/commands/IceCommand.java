@@ -5,7 +5,6 @@ package org.selurgniman.bukkit.theneedfuls.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.selurgniman.bukkit.theneedfuls.Message;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
@@ -14,7 +13,7 @@ import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
  * @author <a href="mailto:selurgniman@selurgniman.org">Selurgniman</a> Created
  *         on: Dec 18, 2011
  */
-public class IceCommand implements CommandExecutor {
+public class IceCommand extends AbstractCommand {
 	private final TheNeedfuls plugin;
 
 	/**
@@ -22,7 +21,9 @@ public class IceCommand implements CommandExecutor {
 	 * @param plugin
 	 */
 	public IceCommand(TheNeedfuls plugin) {
+		super(plugin);
 		this.plugin = plugin;
+		this.setSubCommands(IceSubCommand.values());
 	}
 
 	/*
@@ -33,53 +34,29 @@ public class IceCommand implements CommandExecutor {
 	 * , org.bukkit.command.Command, java.lang.String, java.lang.String[])
 	 */
 	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		IceSubCommand operation = null;
-		try {
-			operation = IceSubCommand.valueOf(args[0].toUpperCase());
-		} catch (IllegalArgumentException ex) {
-			return false;
-		} catch (ArrayIndexOutOfBoundsException ex) {
-			return false;
-		}
+	public boolean processCommand(CommandSender sender, Command command, String label, String[] args, ISubCommand operation, String option) {
+		if (operation instanceof IceSubCommand) {
+			switch ((IceSubCommand) operation) {
+				case QUANTITY: {
+					try {
+						plugin.getConfig().set("iceMaker.quantity", Integer.parseInt(option));
+						plugin.saveConfig();
+					} catch (NumberFormatException ex) {
 
-		String option = "";
-		if (args.length > 1) {
-			option = args[1];
-		}
+					}
 
-		if (option.equalsIgnoreCase("help")) {
-			sender.sendMessage(operation.getHelp());
-			sender.sendMessage(operation.getUsage());
-
-			return true;
-		}
-
-		if (!sender.hasPermission(command.getPermission() + "." + operation.toString().toLowerCase())) {
-			sender.sendMessage(String.format(Message.LACK_PERMISSION_MESSAGE.toString(),command.getPermission(),operation.toString().toLowerCase()));
-			return false;
-		}
-
-		switch (operation) {
-			case QUANTITY: {
-				try {
-					plugin.getConfig().set("iceMaker.quantity", Integer.parseInt(option));
-					plugin.saveConfig();					
-				} catch (NumberFormatException ex) {
-
+					sender.sendMessage(String.format(Message.ICE_QUANTITY_MESSAGE.toString(), plugin.getConfig().get("iceMaker.quantity")));
+					return true;
 				}
-				
-				sender.sendMessage(String.format(Message.ICE_QUANTITY_MESSAGE.toString(), plugin.getConfig().get("iceMaker.quantity")));
-				return true;
-			}
-
-			default: {
-				return false;
 			}
 		}
+
+		return false;
 	}
 
-	public enum IceSubCommand {
+	public static enum IceSubCommand
+			implements
+			ISubCommand {
 		QUANTITY(
 				ChatColor.GREEN + "Ice Quantity: " + ChatColor.WHITE + "displays and sets the size of the stack of ice dispensed per water bucket.",
 				"/tni quantity <stack size 1-64>");

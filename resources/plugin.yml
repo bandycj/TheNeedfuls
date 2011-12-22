@@ -10,7 +10,7 @@ commands:
         description: Get help with TheNeedfuls.
         permission: theneedfuls.help
         usage:  |
-            /<command> help [torch|ice] [option]
+            /<command> [torch|ice|xp|ohnoez|help]
     tnt:
         description: Set TheNeedfuls torch options.
         permission: theneedfuls.torch
@@ -38,14 +38,39 @@ commands:
             Example: /<command> give <player> 5 - add 5 levels to the player.
             Example: /<command> take <player> 5 - remove 5 levels from the player.
             Example: /<command> set <player> 5 - set the player's level to 5.
+    ohnoez:
+        description: Set TheNeedfuls ohnoez options.
+        permission: theneedfuls.ohnoez
+        usage:  |
+            /<command> [list|credits|claim|world] [level integer]
+            Example: /<command> list - Show the player's last death inventory.
+            Example: /<command> credits - Show the players available credits.
+            Example: /<command> credits add <player> 1 - add 1 credit for the player.
+            Example: /<command> credits set <player> 0 - set the player's credits to 0.
+            Example: /<command> claim - use an available credit and get your drops back.
+            Example: /<command> worlds - see a list of worlds that death inventory tracking is enabled on.
+            Example: /<command> worlds add world - enable death inventory tracking on world named "world".
+            Example: /<command> worlds remove world - disable death inventory tracking on world named "world".
 
 permissions:
     theneedfuls.*:
         description: Gives access to all TheNeedfuls commands.
         default: op
         children:
+        	theneedfuls.help.*: true
             theneedfuls.torch.*: true
             theneedfuls.ice.*: true
+            theneedfuls.xp.*: true
+            theneedfuls.ohnoez.*: true
+    theneedfuls.help.*:
+        description: Gives access to all TheNeedfuls help commands.
+        default: true
+        children:
+            theneedfuls.help.help: true
+            theneedfuls.help.torch: true
+            theneedfuls.help.ice: true
+            theneedfuls.help.xp: true
+            theneedfuls.help.ohnoez: true
     theneedfuls.torch.*:
         description: Gives access to all TheNeedfuls torch commands.
         default: op
@@ -68,6 +93,29 @@ permissions:
             theneedfuls.xp.give: true
             theneedfuls.xp.take: true
             theneedfuls.xp.set: true
+    theneedfuls.ohnoez.*:
+        description: Gives access to all TheNeedfuls ohnoez commands.
+        default: op
+        children:
+            theneedfuls.ohnoez.list: true
+            theneedfuls.ohnoez.credits.*: true
+            theneedfuls.ohnoez.claim: true
+            theneedfuls.ohnoez.worlds: true
+    theneedfuls.help.help:
+        description: Allows you to see help for help.
+        default: true
+    theneedfuls.help.torch:
+        description: Allows you to see help for torch.
+        default: true
+    theneedfuls.help.ice:
+        description: Allows you to see help for ice.
+        default: true
+    theneedfuls.help.xp:
+        description: Allows you to see help for xp.
+        default: true
+    theneedfuls.help.ohnoez:
+        description: Allows you to see help for ohnoez.
+        default: true
     theneedfuls.torch.age:
         description: Allows you to set the maximum age for torches.
         default: op
@@ -97,4 +145,29 @@ permissions:
         default: op
     theneedfuls.xp.set:
         description: Allows you to set another player's experience level.
+        default: op
+    theneedfuls.ohnoez.list:
+        description: Allows you to list your last store death inventory.
+        default: yes
+    theneedfuls.ohnoez.credits.*:
+        description: Gives access to all TheNeedfuls ohnoez credit commands.
+        default: op
+        children:
+            theneedfuls.ohnoez.credits.show: true
+            theneedfuls.ohnoez.credits.add: true
+            theneedfuls.ohnoez.credits.set: true
+    theneedfuls.ohnoez.credits.show:
+        description: Allows you to display the available credits.
+        default: yes
+    theneedfuls.ohnoez.credits.add:
+        description: Allows you to add available credits.
+        default: op
+    theneedfuls.ohnoez.credits.set:
+        description: Allows you to set available credits.
+        default: op
+    theneedfuls.ohnoez.claim:
+        description: Allows you to claim an available credit.
+        default: true
+    theneedfuls.ohnoez.worlds:
+        description: Allows you to set the worlds which death inventory tracking is enabled.
         default: op

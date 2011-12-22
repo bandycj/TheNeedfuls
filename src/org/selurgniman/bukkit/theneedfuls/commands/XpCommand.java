@@ -5,7 +5,6 @@ package org.selurgniman.bukkit.theneedfuls.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.selurgniman.bukkit.theneedfuls.Message;
@@ -15,7 +14,7 @@ import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
  * @author <a href="mailto:selurgniman@selurgniman.org">Selurgniman</a> Created
  *         on: Dec 18, 2011
  */
-public class XpCommand implements CommandExecutor {
+public class XpCommand extends AbstractCommand {
 	private final TheNeedfuls plugin;
 
 	/**
@@ -23,6 +22,7 @@ public class XpCommand implements CommandExecutor {
 	 * @param plugin
 	 */
 	public XpCommand(TheNeedfuls plugin) {
+		super(plugin);
 		this.plugin = plugin;
 	}
 
@@ -34,83 +34,61 @@ public class XpCommand implements CommandExecutor {
 	 * , org.bukkit.command.Command, java.lang.String, java.lang.String[])
 	 */
 	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		XpSubCommand operation = null;
-		try {
-			operation = XpSubCommand.valueOf(args[0].toUpperCase());
-		} catch (IllegalArgumentException ex) {
-			return false;
-		} catch (ArrayIndexOutOfBoundsException ex) {
-			return false;
-		}
-
-		String option = "";
-		Integer amount = 0;
-		if (args.length > 1) {
-			option = args[1];
-		}
-
-		if (args.length > 2) {
-			try {
-				amount = Integer.parseInt(args[2]);
-			} catch (NumberFormatException ex) {
-				return false;
+	public boolean processCommand(CommandSender sender, Command command, String label, String[] args, ISubCommand operation, String option) {
+		if (operation instanceof XpSubCommand) {
+			Integer amount = 0;
+			if (args.length > 2) {
+				try {
+					amount = Integer.parseInt(args[2]);
+				} catch (NumberFormatException ex) {
+					return false;
+				}
 			}
-		}
 
-		if (option.equalsIgnoreCase("help")) {
-			sender.sendMessage(operation.getHelp());
-			sender.sendMessage(operation.getUsage());
-
-			return true;
-		}
-
-		if (!sender.hasPermission(command.getPermission() + "." + operation.toString().toLowerCase())) {
-			sender.sendMessage(String.format(Message.LACK_PERMISSION_MESSAGE.toString(),command.getPermission(),operation.toString().toLowerCase()));
-			return true;
-		}
-
-		Player player = plugin.getServer().getPlayer(option);
-		if (player == null) {
-			sender.sendMessage(ChatColor.RED + "Player not found: " + ChatColor.WHITE + option);
-			return true;
-		}
-
-		switch (operation) {
-			case SHOW: {
-				sender.sendMessage(String.format(Message.SHOW_EXPERIENCE_MESSAGE.toString(), player.getDisplayName(), player.getLevel()));
+			Player player = plugin.getServer().getPlayer(option);
+			if (player == null) {
+				sender.sendMessage(ChatColor.RED + "Player not found: " + ChatColor.WHITE + option);
 				return true;
 			}
-			case GIVE: {
-				if (amount > 0) {
-					player.setLevel(player.getLevel() + amount);
+
+			switch ((XpSubCommand)operation) {
+				case SHOW: {
+					sender.sendMessage(String.format(Message.SHOW_EXPERIENCE_MESSAGE.toString(), player.getDisplayName(), player.getLevel()));
 					return true;
 				}
-				break;
-			}
-			case TAKE: {
-				if (amount > 0) {
-					player.setLevel(player.getLevel() - amount);
-					return true;
+				case GIVE: {
+					if (amount > 0) {
+						player.setLevel(player.getLevel() + amount);
+						return true;
+					}
+					break;
 				}
-				break;
-			}
-			case SET: {
-				if (amount > 0) {
-					player.setLevel(amount);
-					return true;
+				case TAKE: {
+					if (amount > 0) {
+						player.setLevel(player.getLevel() - amount);
+						return true;
+					}
+					break;
 				}
-				break;
-			}
-			default: {
-				sender.sendMessage(String.format(Message.SHOW_EXPERIENCE_MESSAGE.toString(), player.getDisplayName(), player.getLevel()));
-				break;
+				case SET: {
+					if (amount > 0) {
+						player.setLevel(amount);
+						return true;
+					}
+					break;
+				}
+				default: {
+					sender.sendMessage(String.format(Message.SHOW_EXPERIENCE_MESSAGE.toString(), player.getDisplayName(), player.getLevel()));
+					break;
+				}
 			}
 		}
 		return false;
 	}
 
-	public enum XpSubCommand {
+	public static enum XpSubCommand
+			implements
+			ISubCommand {
 		SHOW(
 				ChatColor.GREEN + "XP Show: " + ChatColor.WHITE + "shows the experience level of a player.",
 				"/tnx show <player>"),
