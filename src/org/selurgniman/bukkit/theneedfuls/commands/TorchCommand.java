@@ -63,7 +63,7 @@ public class TorchCommand implements CommandExecutor {
 		}
 
 		if (!sender.hasPermission(command.getPermission() + "." + operation.toString().toLowerCase())) {
-			sender.sendMessage("You are not an op or lack the permission: " + command.getPermission() + "." + operation.toString().toLowerCase());
+			sender.sendMessage(String.format(Message.LACK_PERMISSION_MESSAGE.toString(),command.getPermission(),operation.toString().toLowerCase()));
 			return false;
 		}
 

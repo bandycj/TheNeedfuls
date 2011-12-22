@@ -1,5 +1,5 @@
 name: TheNeedfuls
-version: 0.1
+version: 0.2
 author: Selurgniman
 main: org.selurgniman.bukkit.theneedfuls.TheNeedfuls
 
@@ -29,6 +29,15 @@ commands:
         usage:  |
             /<command> [quantity] [1-64]
             Example: /<command> quantity 32 - set the stack size of the dispensed ice to 32.
+    tnx:
+        description: Set TheNeedfuls experience options.
+        permission: theneedfuls.xp
+        usage:  |
+            /<command> [show|give|take|set] [level integer]
+            Example: /<command> show <player> - Show the player's level.
+            Example: /<command> give <player> 5 - add 5 levels to the player.
+            Example: /<command> take <player> 5 - remove 5 levels from the player.
+            Example: /<command> set <player> 5 - set the player's level to 5.
 
 permissions:
     theneedfuls.*:
@@ -51,6 +60,14 @@ permissions:
         default: op
         children:
             theneedfuls.ice.quantity: true
+    theneedfuls.xp.*:
+        description: Gives access to all TheNeedfuls experience commands.
+        default: op
+        children:
+            theneedfuls.xp.show: true
+            theneedfuls.xp.give: true
+            theneedfuls.xp.take: true
+            theneedfuls.xp.set: true
     theneedfuls.torch.age:
         description: Allows you to set the maximum age for torches.
         default: op
@@ -68,4 +85,16 @@ permissions:
         default: op
     theneedfuls.ice.quantity:
         description: Allows you to set the stack size for the ice being dispensed.
+        default: op
+    theneedfuls.xp.show:
+        description: Allows you to see a player's experience level.
+        default: true
+    theneedfuls.xp.give:
+        description: Allows you to give a player experience levels.
+        default: op
+    theneedfuls.xp.take:
+        description: Allows you to take experience levels from a player.
+        default: op
+    theneedfuls.xp.set:
+        description: Allows you to set another player's experience level.
         default: op

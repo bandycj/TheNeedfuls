@@ -54,10 +54,16 @@ public class Message {
 			+ "%1$d"
 			+ ChatColor.WHITE
 			+ ")");
-	public static Message ICE_WORLDS_MESSAGE = new Message("ICE_WORLDS_MESSAGE", PREFIX
-			+ "Ice stack size dispensed ("
-			+ ChatColor.BLUE
-			+ "%1$d"
+	public static Message LACK_PERMISSION_MESSAGE = new Message("LACK_PERMISSION_MESSAGE", PREFIX
+			+ "You are not an op or lack permission ("
+			+ ChatColor.GREEN
+			+ "%1$s.%2$s"
+			+ ChatColor.WHITE
+			+ ")");
+	public static Message SHOW_EXPERIENCE_MESSAGE = new Message("SHOW_EXPERIENCE_MESSAGE", PREFIX
+			+ "%1$s's level ("
+			+ ChatColor.GREEN
+			+ "%2$d"
 			+ ChatColor.WHITE
 			+ ")");
 
@@ -71,6 +77,8 @@ public class Message {
 		values.put(TORCH_EXPIRE_MESSAGE.getKey(), TORCH_EXPIRE_MESSAGE);
 		values.put(TORCH_WORLDS_MESSAGE.getKey(), TORCH_WORLDS_MESSAGE);
 		values.put(ICE_QUANTITY_MESSAGE.getKey(), ICE_QUANTITY_MESSAGE);
+		values.put(LACK_PERMISSION_MESSAGE.getKey(), LACK_PERMISSION_MESSAGE);
+		values.put(SHOW_EXPERIENCE_MESSAGE.getKey(), SHOW_EXPERIENCE_MESSAGE);
 	}
 
 	private final String key;
