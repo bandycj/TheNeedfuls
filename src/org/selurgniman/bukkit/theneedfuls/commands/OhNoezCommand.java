@@ -18,22 +18,23 @@ import org.selurgniman.bukkit.theneedfuls.helpers.InkSackHelper;
 import org.selurgniman.bukkit.theneedfuls.helpers.Message;
 import org.selurgniman.bukkit.theneedfuls.helpers.PotionHelper;
 import org.selurgniman.bukkit.theneedfuls.model.Credit;
+import org.selurgniman.bukkit.theneedfuls.model.Model;
 import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
+import org.selurgniman.bukkit.theneedfuls.model.OhNoezModel;
 
 /**
  * @author <a href="mailto:selurgniman@selurgniman.org">Selurgniman</a> Created
  *         on: Dec 18, 2011
  */
 public class OhNoezCommand extends AbstractCommand {
-	private final TheNeedfuls plugin;
-
+	private final OhNoezModel model;
 	/**
 	 * @param name
 	 * @param plugin
 	 */
 	public OhNoezCommand(TheNeedfuls plugin) {
 		super(plugin);
-		this.plugin = plugin;
+		this.model = (OhNoezModel)Model.getCommandModel(CommandType.OHNOEZ);
 		this.setSubCommands(OhNoezSubCommand.values());
 	}
 
@@ -54,7 +55,7 @@ public class OhNoezCommand extends AbstractCommand {
 						if (player == null) {
 							player = (Player) sender;
 						}
-						List<ItemStack> droppedItems = plugin.getModel().getLastInventory(player);
+						List<ItemStack> droppedItems = model.getLastInventory(player);
 						if (droppedItems.size() > 0) {
 							for (ItemStack itemStack : droppedItems) {
 								String itemTypeName = itemStack.getType().toString();
@@ -69,7 +70,7 @@ public class OhNoezCommand extends AbstractCommand {
 								}
 								sender.sendMessage(String.format(Message.LIST_ITEM_MESSAGE + "\n", itemTypeName, itemStack.getAmount()));
 							}
-							SimpleEntry<Integer, Float> lastExp = plugin.getModel().getLastExperience(player);
+							SimpleEntry<Integer, Float> lastExp = model.getLastExperience(player);
 							sender.sendMessage(String.format(Message.LIST_ITEM_MESSAGE.toString(), "Experience levels", lastExp.getKey()));
 						} else {
 							sender.sendMessage(Message.NO_ITEMS_MESSAGE.toString());
@@ -85,33 +86,33 @@ public class OhNoezCommand extends AbstractCommand {
 						sender.sendMessage(String.format(
 								Message.AVAILABLE_CREDITS_MESSAGE.toString(),
 								player.getName(),
-								plugin.getModel().getAvailableCredits(player)));
+								model.getAvailableCredits(player)));
 						return true;
 					} else if (args.length > 3) {
-						Player player = plugin.getServer().getPlayer(args[2]);
+						Player player = getPlugin().getServer().getPlayer(args[2]);
 						int amount = Integer.parseInt(args[3]);
 						if (option.equalsIgnoreCase("ADD")) {
-							plugin.getModel().addAvailableCredits(player, amount);
+							model.addAvailableCredits(player, amount);
 						} else if (option.equalsIgnoreCase("SET")) {
-							plugin.getModel().setAvailableCredits(player, amount);
+							model.setAvailableCredits(player, amount);
 						}
 						sender.sendMessage(String.format(
 								Message.AVAILABLE_CREDITS_MESSAGE.toString(),
 								player.getName(),
-								plugin.getModel().getAvailableCredits(player)));
+								model.getAvailableCredits(player)));
 						return true;
 					}
 
 					return false;
 				}
 				case CLAIM: {
-					if (sender instanceof Player && plugin.getModel().isCommandWorld(CommandType.OHNOEZ,((Player) sender).getWorld())) {
+					if (sender instanceof Player && this.getPlugin().getModel().isCommandWorld(CommandType.OHNOEZ,((Player) sender).getWorld())) {
 						Player player = (Player) sender;
-						List<ItemStack> droppedItems = plugin.getModel().getLastInventory(player);
-						Entry<Integer, Float> droppedExp = plugin.getModel().getLastExperience(player);
+						List<ItemStack> droppedItems = model.getLastInventory(player);
+						Entry<Integer, Float> droppedExp = model.getLastExperience(player);
 
 						if (droppedItems != null) {
-							if (plugin.getModel().getAvailableCredits(player) > 0) {
+							if (model.getAvailableCredits(player) > 0) {
 								for (ItemStack itemStack : droppedItems) {
 									player.getInventory().addItem(itemStack);
 									sender.sendMessage(String.format(
@@ -122,11 +123,9 @@ public class OhNoezCommand extends AbstractCommand {
 								player.setLevel(player.getLevel() + droppedExp.getKey());
 								player.setExp(player.getExp() + droppedExp.getValue());
 
-								plugin.getModel().useAvailableCredit(player);
+								model.useAvailableCredit(player);
 							} else {
-								sender.sendMessage(String.format(Message.AVAILABLE_CREDITS_MESSAGE.toString(), player.getName(), plugin
-										.getModel()
-										.getAvailableCredits(player)));
+								sender.sendMessage(String.format(Message.AVAILABLE_CREDITS_MESSAGE.toString(), player.getName(), model.getAvailableCredits(player)));
 							}
 						} else {
 							sender.sendMessage(Message.NO_ITEMS_MESSAGE.toString());

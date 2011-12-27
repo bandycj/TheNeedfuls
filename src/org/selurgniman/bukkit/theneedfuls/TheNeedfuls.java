@@ -36,7 +36,9 @@ import org.selurgniman.bukkit.theneedfuls.listeners.TheNeedfulsEntityListener;
 import org.selurgniman.bukkit.theneedfuls.listeners.TheNeedfulsPlayerListener;
 import org.selurgniman.bukkit.theneedfuls.model.Credit;
 import org.selurgniman.bukkit.theneedfuls.model.Model;
+import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
 import org.selurgniman.bukkit.theneedfuls.model.Torch;
+import org.selurgniman.bukkit.theneedfuls.model.TorchModel;
 
 import com.avaje.ebean.EbeanServer;
 
@@ -159,7 +161,7 @@ public class TheNeedfuls extends JavaPlugin {
 		torchTaskId = this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
 			@Override
 			public void run() {
-				model.expireTorches();
+				((TorchModel)Model.getCommandModel(CommandType.TORCH)).expireTorches();
 			}
 		}, 60L, this.getConfig().getLong(Torch.TORCH_REFRESH_KEY) * 20);
 	}

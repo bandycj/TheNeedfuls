@@ -15,22 +15,25 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
 import org.selurgniman.bukkit.theneedfuls.helpers.Message;
+import org.selurgniman.bukkit.theneedfuls.model.Model;
+import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
+import org.selurgniman.bukkit.theneedfuls.model.WorldsModel;
 
 /**
  * @author <a href="mailto:selurgniman@selurgniman.org">Selurgniman</a> Created
  *         on: Dec 18, 2011
  */
 public class WorldsCommand extends AbstractCommand {
-	private final TheNeedfuls plugin;
 	public final static String CONFIG_TELEPORT_DELAY = "worlds.teleportDelaySeconds";
 
+	public final WorldsModel model;
 	/**
 	 * @param name
-	 * @param plugin
+	 * @param getPlugin()
 	 */
 	public WorldsCommand(TheNeedfuls plugin) {
 		super(plugin);
-		this.plugin = plugin;
+		this.model = (WorldsModel)Model.getCommandModel(CommandType.WORLDS);
 		this.setSubCommands(WorldsSubCommand.values());
 	}
 
@@ -48,7 +51,7 @@ public class WorldsCommand extends AbstractCommand {
 				case CREATE: {
 					if (!option.isEmpty()) {
 						WorldCreator creator = new WorldCreator(option);
-						plugin.getServer().createWorld(creator);
+						getPlugin().getServer().createWorld(creator);
 
 						sender.sendMessage(String.format(Message.WORLD_CREATED_MESSAGE.toString(), option));
 						return true;
@@ -57,7 +60,7 @@ public class WorldsCommand extends AbstractCommand {
 					break;
 				}
 				case DELETE: {
-					Server server = plugin.getServer();
+					Server server = getPlugin().getServer();
 					try {
 						World world = server.getWorld(UUID.fromString(option));
 						String name = world.getName();
@@ -74,13 +77,13 @@ public class WorldsCommand extends AbstractCommand {
 					break;
 				}
 				case LIST: {
-					sender.sendMessage(String.format(Message.WORLD_LIST_MESSAGE.toString(), getWorldsList(plugin.getServer().getWorlds())));
+					sender.sendMessage(String.format(Message.WORLD_LIST_MESSAGE.toString(), getWorldsList(getPlugin().getServer().getWorlds())));
 
 					return true;
 				}
 				case PORT: {
 					if (sender instanceof Player && !option.isEmpty()) {
-						World world = plugin.getServer().getWorld(option);
+						World world = getPlugin().getServer().getWorld(option);
 						Player player = (Player) sender;
 						player.teleport(world.getSpawnLocation(), TeleportCause.COMMAND);
 
@@ -91,13 +94,13 @@ public class WorldsCommand extends AbstractCommand {
 				}
 				case DELAY: {
 					try {
-						plugin.getConfig().set(WorldsCommand.CONFIG_TELEPORT_DELAY, Integer.parseInt(option));
-						plugin.saveConfig();
+						getPlugin().getConfig().set(WorldsCommand.CONFIG_TELEPORT_DELAY, Integer.parseInt(option));
+						getPlugin().saveConfig();
 					} catch (NumberFormatException ex) {
 
 					}
 
-					sender.sendMessage(String.format(Message.WORLD_DELAY_MESSAGE.toString(), plugin.getConfig().get(WorldsCommand.CONFIG_TELEPORT_DELAY)));
+					sender.sendMessage(String.format(Message.WORLD_DELAY_MESSAGE.toString(), getPlugin().getConfig().get(WorldsCommand.CONFIG_TELEPORT_DELAY)));
 
 					return true;
 				}

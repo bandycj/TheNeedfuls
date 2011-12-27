@@ -25,6 +25,9 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
 import org.selurgniman.bukkit.theneedfuls.commands.WorldsCommand;
 import org.selurgniman.bukkit.theneedfuls.helpers.Message;
+import org.selurgniman.bukkit.theneedfuls.model.Model;
+import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
+import org.selurgniman.bukkit.theneedfuls.model.WorldsModel;
 
 /**
  * @author <a href="mailto:selurgniman@selurgniman.org">Selurgniman</a> Created
@@ -34,101 +37,34 @@ public class TheNeedfulsPlayerListener extends PlayerListener {
 	private static final BlockFace[] blockfaces = new BlockFace[] { BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.NORTH_WEST, BlockFace.EAST,
 			BlockFace.WEST, BlockFace.SOUTH, BlockFace.SOUTH_EAST, BlockFace.SOUTH_WEST };
 	private final TheNeedfuls plugin;
+	private final WorldsModel worldsModel;
 	private final Pattern signPattern = Pattern.compile("^\\[(.*)\\]$");
 	private final IdentityHashMap<Player, Date> playersTeleported = new IdentityHashMap<Player, Date>();
 
 	public TheNeedfulsPlayerListener(TheNeedfuls plugin) {
 		this.plugin = plugin;
+		this.worldsModel = (WorldsModel) Model.getCommandModel(CommandType.WORLDS);
 	}
 
 	@Override
 	public void onPlayerInteract(PlayerInteractEvent event) {
-		Block clickedBlock = event.getClickedBlock();
-		if (clickedBlock != null && clickedBlock.getType() == Material.STONE_PLATE) {
-			String worldName = "undefined";
-			Player player = event.getPlayer();
-			Block nextLevel = clickedBlock.getRelative(BlockFace.DOWN);
-			BlockFace airBlock = null;
-
-			boolean valid = (nextLevel.getType() == Material.IRON_BLOCK && clickedBlock.getRelative(BlockFace.UP, 2).getType() == Material.GLOWSTONE);
-
-			if (valid && playersTeleported.get(player) != null) {
-				Date now = new Date();
-				now.setTime(now.getTime() - (plugin.getConfig().getLong(WorldsCommand.CONFIG_TELEPORT_DELAY) * 1000));
-				if (playersTeleported.get(player).after(now)) {
-					Long timeRemaining = (playersTeleported.get(player).getTime() - now.getTime()) / 1000;
-					player.sendMessage(String.format(Message.WORLD_DELAY_MESSAGE.toString(), timeRemaining));
-					valid = false;
-				}
-			}
-
-			if (valid) {
-				for (BlockFace blockface : blockfaces) {
-					if (nextLevel.getRelative(blockface).getType() != Material.IRON_BLOCK) {
-						valid = false;
-						break;
+		if (!event.isCancelled()) {
+			Block clickedBlock = event.getClickedBlock();
+			if (clickedBlock != null && clickedBlock.getType() == Material.STONE_PLATE) {
+				Player player = event.getPlayer();
+				
+				TeleporterValidator validator = new TeleporterValidator(player,clickedBlock);
+				if (validator.isValid()) {
+					String worldName = validator.getWorldName();
+					World world = plugin.getServer().getWorld(worldName);
+					if (world != null && world.getEnvironment() == player.getWorld().getEnvironment()) {
+						player.teleport(world.getSpawnLocation(), TeleportCause.PLUGIN);
+						player.sendMessage(String.format(Message.WORLD_TELEPORT_MESSAGE.toString(), worldName));
+						playersTeleported.put(player, new Date());
+						event.setCancelled(true);
+					} else {
+						player.sendMessage(String.format(Message.WORLD_UNKNOWN_MESSAGE.toString(), worldName));
 					}
-				}
-			}
-
-			for (int i = 0; i < 2; i++) {
-				if (valid) {
-					nextLevel = nextLevel.getRelative(BlockFace.UP);
-					for (BlockFace blockface : blockfaces) {
-						Block nextBlock = nextLevel.getRelative(blockface);
-						if (blockface == BlockFace.NORTH || blockface == BlockFace.SOUTH || blockface == BlockFace.EAST || blockface == BlockFace.WEST) {
-							if (nextBlock.getType() == Material.AIR && airBlock == null) {
-								airBlock = blockface;
-							} else if (nextBlock.getType() == Material.AIR && blockface != airBlock) {
-								valid = false;
-								break;
-							} else if (nextBlock.getType() != Material.GLASS && blockface != airBlock) {
-								valid = false;
-								break;
-							}
-						} else if ((blockface == BlockFace.NORTH_EAST || blockface == BlockFace.NORTH_WEST || blockface == BlockFace.SOUTH_EAST || blockface == BlockFace.SOUTH_WEST)
-								&& nextBlock.getType() != Material.IRON_BLOCK) {
-							valid = false;
-							break;
-						}
-					}
-				} else {
-					break;
-				}
-			}
-
-			if (valid) {
-				nextLevel = nextLevel.getRelative(BlockFace.UP);
-				for (BlockFace blockface : blockfaces) {
-					Block nextBlock = nextLevel.getRelative(blockface);
-					if (nextBlock.getType() != Material.IRON_BLOCK) {
-						valid = false;
-						break;
-					}
-				}
-			}
-
-			if (valid) {
-				Block signBlock = nextLevel.getRelative(airBlock, 2);
-				if (signBlock.getState() instanceof Sign) {
-					for (String line : ((Sign) signBlock.getState()).getLines()) {
-						Matcher matcher = signPattern.matcher(line);
-						if (matcher.matches()) {
-							worldName = matcher.group(1);
-						}
-					}
-				}
-			}
-
-			if (valid && !worldName.isEmpty()) {
-				World world = plugin.getServer().getWorld(worldName);
-				if (world != null && world.getEnvironment() == player.getWorld().getEnvironment()) {
-					player.teleport(world.getSpawnLocation(), TeleportCause.PLUGIN);
-					player.sendMessage(String.format(Message.WORLD_TELEPORT_MESSAGE.toString(), worldName));
-					playersTeleported.put(player, new Date());
-					event.setCancelled(true);
-				} else {
-					player.sendMessage(String.format(Message.WORLD_UNKNOWN_MESSAGE.toString(), worldName));
 				}
 			}
 		}
@@ -181,18 +117,123 @@ public class TheNeedfulsPlayerListener extends PlayerListener {
 			checkInventory(event);
 		}
 	}
-	
-	private void checkInventory(PlayerTeleportEvent event){
+
+	private void checkInventory(PlayerTeleportEvent event) {
 		World from = event.getFrom().getWorld();
 		World to = event.getTo().getWorld();
 		if (from != to) {
 			String fromString = from.getName().toLowerCase().replace("_nether", "").replace("_the_end", "");
 			String toString = to.getName().toLowerCase().replace("_nether", "").replace("_the_end", "");
 			if (!fromString.equals(toString)) {
-				System.out.println("player:"+event.getPlayer());
-				plugin.getModel().storeWorldInventory(from, event.getPlayer());
-				plugin.getModel().restoreWorldInventory(to, event.getPlayer());
+				worldsModel.storeWorldInventory(from, event.getPlayer());
+				worldsModel.restoreWorldInventory(to, event.getPlayer());
 			}
+		}
+	}
+	
+	private class TeleporterValidator {
+		private BlockFace airBlockFace = null;
+		private String worldName = "";
+		private boolean valid;
+		
+		public TeleporterValidator(Player player, Block clickedBlock){
+			Block nextLevel = clickedBlock.getRelative(BlockFace.DOWN);
+
+			valid = (nextLevel.getType() == Material.IRON_BLOCK && clickedBlock.getRelative(BlockFace.UP, 2).getType() == Material.GLOWSTONE);
+
+			if (valid) {
+				valid = isDelayMet(player);
+			}
+
+			if (valid) {
+				valid = isBaseCorrect(nextLevel);
+			}
+
+			for (int i = 0; i < 2; i++) {
+				if (valid) {
+					nextLevel = nextLevel.getRelative(BlockFace.UP);
+					valid = isSideCorrect(nextLevel);
+					System.out.println("airblockface:" + airBlockFace);
+				} else {
+					break;
+				}
+			}
+
+			if (valid) {
+				nextLevel = nextLevel.getRelative(BlockFace.UP);
+				valid = isBaseCorrect(nextLevel);
+			}
+
+			if (valid) {
+				worldName = getWorldName(nextLevel, airBlockFace);
+				valid = worldName.isEmpty() == false;
+			}
+		}
+		
+		private boolean isDelayMet(Player player) {
+			Date now = new Date();
+			now.setTime(now.getTime() - (plugin.getConfig().getLong(WorldsCommand.CONFIG_TELEPORT_DELAY) * 1000));
+			if (playersTeleported.get(player) == null) {
+				playersTeleported.put(player, now);
+				return true;
+			}
+
+			if (playersTeleported.get(player).after(now)) {
+				Long timeRemaining = (playersTeleported.get(player).getTime() - now.getTime()) / 1000;
+				player.sendMessage(String.format(Message.WORLD_DELAY_MESSAGE.toString(), timeRemaining));
+				return false;
+			}
+			return true;
+		}
+		
+		private boolean isBaseCorrect(Block base) {
+			for (BlockFace blockface : blockfaces) {
+				if (base.getRelative(blockface).getType() != Material.IRON_BLOCK) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		private boolean isSideCorrect(Block side) {
+			for (BlockFace blockface : blockfaces) {
+				Block nextBlock = side.getRelative(blockface);
+				if (blockface == BlockFace.NORTH || blockface == BlockFace.SOUTH || blockface == BlockFace.EAST || blockface == BlockFace.WEST) {
+					if (nextBlock.getType() == Material.AIR && airBlockFace == null) {
+						airBlockFace = blockface;
+					} else if (nextBlock.getType() == Material.AIR && blockface != airBlockFace) {
+						return false;
+					} else if (nextBlock.getType() != Material.GLASS && blockface != airBlockFace) {
+						return false;
+					}
+				} else if ((blockface == BlockFace.NORTH_EAST || blockface == BlockFace.NORTH_WEST || blockface == BlockFace.SOUTH_EAST || blockface == BlockFace.SOUTH_WEST)
+						&& nextBlock.getType() != Material.IRON_BLOCK) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		private String getWorldName(Block topBlock, BlockFace airBlockFace) {
+			Block signBlock = topBlock.getRelative(airBlockFace, 2);
+			if (signBlock.getState() instanceof Sign) {
+				for (String line : ((Sign) signBlock.getState()).getLines()) {
+					Matcher matcher = signPattern.matcher(line);
+					if (matcher.matches()) {
+						return matcher.group(1);
+					}
+				}
+			}
+			return "";
+		}
+		
+		public String getWorldName(){
+			return this.worldName;
+		}
+		
+		public boolean isValid(){
+			return this.valid;
 		}
 	}
 }

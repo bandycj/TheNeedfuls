@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
 import org.selurgniman.bukkit.theneedfuls.model.Model;
 import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
+import org.selurgniman.bukkit.theneedfuls.model.TorchModel;
 
 /**
  * @author <a href="mailto:selurgniman@selurgniman.org">Selurgniman</a> Created
@@ -23,11 +24,11 @@ import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
  */
 public class TheNeedfulsBlockListener extends BlockListener {
 	private final TheNeedfuls plugin;
-	private final Model model;
+	private final TorchModel torchModel;
 
 	public TheNeedfulsBlockListener(TheNeedfuls plugin) {
 		this.plugin = plugin;
-		this.model = plugin.getModel();
+		this.torchModel = (TorchModel)Model.getCommandModel(CommandType.TORCH);
 		
 	}
 
@@ -35,8 +36,8 @@ public class TheNeedfulsBlockListener extends BlockListener {
 	public void onBlockPlace(BlockPlaceEvent event) {
 		if (!event.isCancelled()) {
 			Block placedBlock = event.getBlockPlaced();
-			if (placedBlock.getType() == Material.TORCH && model.isCommandWorld(CommandType.TORCH,placedBlock.getWorld())) {
-				model.addTorch(event.getBlock());
+			if (placedBlock.getType() == Material.TORCH && plugin.getModel().isCommandWorld(CommandType.TORCH,placedBlock.getWorld())) {
+				torchModel.addTorch(event.getBlock());
 			}
 		}
 	}
@@ -45,8 +46,8 @@ public class TheNeedfulsBlockListener extends BlockListener {
 	public void onBlockBreak(BlockBreakEvent event) {
 		if (!event.isCancelled()) {
 			Block block = event.getBlock();
-			if (block.getType() == Material.TORCH && model.isCommandWorld(CommandType.TORCH,block.getWorld())) {
-				model.removeTorch(event.getBlock());
+			if (block.getType() == Material.TORCH && plugin.getModel().isCommandWorld(CommandType.TORCH,block.getWorld())) {
+				torchModel.removeTorch(event.getBlock());
 			}
 		}
 	}
@@ -55,7 +56,7 @@ public class TheNeedfulsBlockListener extends BlockListener {
 	public void onBlockIgnite(BlockIgniteEvent event) {
 		if (!event.isCancelled()) {
 			Block block = event.getBlock();
-			if (event.getCause() == IgniteCause.FLINT_AND_STEEL && model.isCommandWorld(CommandType.TORCH,block.getWorld())) {
+			if (event.getCause() == IgniteCause.FLINT_AND_STEEL && plugin.getModel().isCommandWorld(CommandType.TORCH,block.getWorld())) {
 				if (block.getRelative(BlockFace.DOWN).getType() == Material.NETHERRACK){
 					event.setCancelled(true);
 				}

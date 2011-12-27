@@ -15,15 +15,11 @@ import org.selurgniman.bukkit.theneedfuls.helpers.Message;
  *         on: Dec 18, 2011
  */
 public class XpCommand extends AbstractCommand {
-	private final TheNeedfuls plugin;
-
 	/**
-	 * @param name
-	 * @param plugin
+	 * @param getPlugin()
 	 */
 	public XpCommand(TheNeedfuls plugin) {
 		super(plugin);
-		this.plugin = plugin;
 		this.setSubCommands(XpSubCommand.values());
 	}
 
@@ -47,7 +43,7 @@ public class XpCommand extends AbstractCommand {
 				}
 			}
 
-			Player player = plugin.getServer().getPlayer(option);
+			Player player = getPlugin().getServer().getPlayer(option);
 			if (player == null) {
 				sender.sendMessage(ChatColor.RED + "Player not found: " + ChatColor.WHITE + option);
 				return true;

@@ -139,4 +139,8 @@ public abstract class AbstractCommand implements CommandExecutor {
 		plugin.saveConfig();
 		plugin.getModel().loadWorldControls();
 	}
+	
+	public TheNeedfuls getPlugin(){
+		return this.plugin;
+	}
 }

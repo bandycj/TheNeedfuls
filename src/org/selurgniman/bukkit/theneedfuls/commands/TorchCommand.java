@@ -8,22 +8,25 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
 import org.selurgniman.bukkit.theneedfuls.helpers.Message;
+import org.selurgniman.bukkit.theneedfuls.model.Model;
+import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
 import org.selurgniman.bukkit.theneedfuls.model.Torch;
+import org.selurgniman.bukkit.theneedfuls.model.TorchModel;
 
 /**
  * @author <a href="mailto:selurgniman@selurgniman.org">Selurgniman</a> Created
  *         on: Dec 18, 2011
  */
 public class TorchCommand extends AbstractCommand {
-	private final TheNeedfuls plugin;
+	private final TorchModel model;
 
 	/**
 	 * @param name
-	 * @param plugin
+	 * @param getPlugin()
 	 */
 	public TorchCommand(TheNeedfuls plugin) {
 		super(plugin);
-		this.plugin = plugin;
+		this.model = (TorchModel)Model.getCommandModel(CommandType.TORCH);
 		this.setSubCommands(TorchSubCommand.values());
 	}
 
@@ -40,42 +43,42 @@ public class TorchCommand extends AbstractCommand {
 			switch ((TorchSubCommand) operation) {
 				case AGE: {
 					try {
-						plugin.getConfig().set(Torch.TORCH_AGE_KEY, Integer.parseInt(option));
-						plugin.saveConfig();
-						plugin.getModel().loadWorldControls();
-						plugin.initTorchTask();
+						getPlugin().getConfig().set(Torch.TORCH_AGE_KEY, Integer.parseInt(option));
+						getPlugin().saveConfig();
+						getPlugin().getModel().loadWorldControls();
+						getPlugin().initTorchTask();
 					} catch (NumberFormatException ex) {
 
 					}
 
-					sender.sendMessage(String.format(Message.TORCH_AGE_MESSAGE.toString(), plugin.getConfig().get(Torch.TORCH_AGE_KEY)));
+					sender.sendMessage(String.format(Message.TORCH_AGE_MESSAGE.toString(), getPlugin().getConfig().get(Torch.TORCH_AGE_KEY)));
 					return true;
 				}
 				case REFRESH: {
 					try {
-						plugin.getConfig().set(Torch.TORCH_REFRESH_KEY, Integer.parseInt(option));
-						plugin.saveConfig();
-						plugin.getModel().loadWorldControls();
-						plugin.initTorchTask();
+						getPlugin().getConfig().set(Torch.TORCH_REFRESH_KEY, Integer.parseInt(option));
+						getPlugin().saveConfig();
+						getPlugin().getModel().loadWorldControls();
+						getPlugin().initTorchTask();
 					} catch (NumberFormatException ex) {
 
 					}
 
-					sender.sendMessage(String.format(Message.TORCH_REFRESH_MESSAGE.toString(), plugin.getConfig().get(Torch.TORCH_REFRESH_KEY)));
+					sender.sendMessage(String.format(Message.TORCH_REFRESH_MESSAGE.toString(), getPlugin().getConfig().get(Torch.TORCH_REFRESH_KEY)));
 					return true;
 				}
 				case COUNT: {
-					int torchCount = plugin.getModel().getTorchCount();
+					int torchCount = model.getTorchCount();
 					sender.sendMessage(String.format(Message.TORCH_COUNT_MESSAGE.toString(), torchCount));
 
 					return true;
 				}
 				case EXPIRE: {
-					int torchCount = plugin.getModel().getTorchCount();
+					int torchCount = model.getTorchCount();
 
-					plugin.getModel().expireAllTorches();
+					model.expireAllTorches();
 					sender.sendMessage(String.format(Message.TORCH_EXPIRE_MESSAGE.toString(), torchCount));
-					torchCount = plugin.getModel().getTorchCount();
+					torchCount = model.getTorchCount();
 					sender.sendMessage(String.format(Message.TORCH_COUNT_MESSAGE.toString(), torchCount));
 
 					return true;
@@ -84,8 +87,8 @@ public class TorchCommand extends AbstractCommand {
 					if (args.length > 2) {
 						addRemoveWorld(option,args[2],Torch.TORCH_WORLDS_KEY);
 					}
-					plugin.getModel().loadWorldControls();
-					plugin.initTorchTask();
+					getPlugin().getModel().loadWorldControls();
+					getPlugin().initTorchTask();
 					sender.sendMessage(String.format(Message.TORCH_WORLDS_MESSAGE.toString(), getWorldsList(Torch.TORCH_WORLDS_KEY)));
 					return true;
 				}
