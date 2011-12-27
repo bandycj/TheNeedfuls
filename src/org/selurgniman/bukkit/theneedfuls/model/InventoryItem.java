@@ -9,8 +9,6 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -22,16 +20,15 @@ import com.avaje.ebean.validation.NotNull;
  *         2011
  */
 @Entity()
-@Table(name = "ohnoez_drops")
-public class Drop {
+@Table(name = "theneedfuls_inventory_items")
+public class InventoryItem {
 
 	@Id
 	private Integer id;
 
-	@ManyToOne(cascade = CascadeType.REFRESH)
-	@JoinColumn(name = "drops")
-	private Credit credit;
-
+	@NotEmpty
+	private String player;
+	
 	@NotNull
 	private Integer itemId;
 
@@ -43,44 +40,47 @@ public class Drop {
 
 	@NotNull
 	private Integer itemDurability;
+	
+	@NotNull
+	private Integer itemSlot;
 
-	@OneToMany(mappedBy = "drop", cascade = CascadeType.ALL)
-	private List<Enchant> enchants;
+	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+	private List<InventoryEnchant> enchants;
 
 	@NotEmpty
 	private String worldUuid;
 
-	public Drop() {
-		this(null, 0, 0, 0, 0, new ArrayList<Enchant>(), "");
+	public InventoryItem() {
+		this("",0, 0, 0, 0, -99, new ArrayList<InventoryEnchant>(), "");
 	}
 
-	public Drop(Credit credit, int itemId, int itemCount, int itemData, int itemDurability, String worldUuid) {
-		this(credit, itemId, itemCount, itemData, itemDurability, new ArrayList<Enchant>(), worldUuid);
+	public InventoryItem(String player,int itemId, int itemCount, int itemData, int itemDurability, int itemSlot, String worldUuid) {
+		this(player,itemId, itemCount, itemData, itemDurability, itemSlot, new ArrayList<InventoryEnchant>(), worldUuid);
 	}
 
-	public Drop(Credit credit, int itemId, int itemCount, int itemData, int itemDurability, List<Enchant> enchants, String worldUuid) {
-		this.credit = credit;
+	public InventoryItem(String player,int itemId, int itemCount, int itemData, int itemDurability, int itemSlot, List<InventoryEnchant> enchants, String worldUuid) {
+		this.player = player;
 		this.itemId = itemId;
 		this.itemCount = itemCount;
 		this.itemData = itemData;
 		this.itemDurability = itemDurability;
+		this.itemSlot = itemSlot;
 		this.enchants = enchants;
 		this.worldUuid = worldUuid;
 	}
 
 	/**
-	 * @return the credit
+	 * @return the player
 	 */
-	public Credit getCredit() {
-		return credit;
+	public String getPlayer() {
+		return player;
 	}
 
 	/**
-	 * @param credit
-	 *            the credit to set
+	 * @param player the player to set
 	 */
-	public void setCredit(Credit credit) {
-		this.credit = credit;
+	public void setPlayer(String player) {
+		this.player = player;
 	}
 
 	/**
@@ -176,7 +176,7 @@ public class Drop {
 	/**
 	 * @return the enchants
 	 */
-	public List<Enchant> getEnchants() {
+	public List<InventoryEnchant> getEnchants() {
 		return enchants;
 	}
 
@@ -184,7 +184,22 @@ public class Drop {
 	 * @param enchants
 	 *            the enchants to set
 	 */
-	public void setEnchants(List<Enchant> enchants) {
+	public void setEnchants(List<InventoryEnchant> enchants) {
 		this.enchants = enchants;
 	}
+
+	/**
+	 * @return the itemSlot
+	 */
+	public Integer getItemSlot() {
+		return itemSlot;
+	}
+
+	/**
+	 * @param itemSlot the itemSlot to set
+	 */
+	public void setItemSlot(Integer itemSlot) {
+		this.itemSlot = itemSlot;
+	}
+	
 }

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.selurgniman.bukkit.theneedfuls;
+package org.selurgniman.bukkit.theneedfuls.helpers;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,7 +17,7 @@ import com.google.common.collect.Maps;
  *         on: Dec 18, 2011
  */
 public class Message {
-	public static Message PREFIX = new Message("PREFIX", ChatColor.RED + "TheNeedfuls: " + ChatColor.WHITE);
+	public static Message PREFIX = new Message("PREFIX", ChatColor.BLUE + "TheNeedfuls: " + ChatColor.WHITE);
 	public static Message TORCH_AGE_MESSAGE = new Message("TORCH_AGE_MESSAGE", PREFIX
 			+ "Torch expiration set to ("
 			+ ChatColor.GREEN
@@ -66,6 +66,12 @@ public class Message {
 			+ "%2$d"
 			+ ChatColor.WHITE
 			+ ")");
+	public static Message INSUFFICIENT_EXPERIENCE_MESSAGE = new Message("INSUFFICIENT_EXPERIENCE_MESSAGE", PREFIX
+			+ "You do not have enough experience to send ("
+			+ ChatColor.GREEN
+			+ "%1$d"
+			+ ChatColor.WHITE
+			+ ") levels!");
 	public static Message LIST_ITEM_MESSAGE = new Message("LIST_ITEM_MESSAGE", PREFIX + "%1$s(" + ChatColor.GREEN + "%2$d" + ChatColor.WHITE + ")");
 	public static Message NO_ITEMS_MESSAGE = new Message("NO_ITEMS_MESSAGE", PREFIX + "No dropped items to list!");
 	public static Message AVAILABLE_CREDITS_MESSAGE = new Message("AVAILABLE_CREDITS_MESSAGE", PREFIX
@@ -86,9 +92,7 @@ public class Message {
 			+ ChatColor.WHITE
 			+ "was just killed by "
 			+ ChatColor.RED
-			+ "%2$s"
-			+ ChatColor.WHITE
-			+ " %3$d blocks from you!");
+			+ "%2$s");
 	public static Message PLAYER_DEATH_MESSAGE = new Message("PLAYER_DEATH_MESSAGE", PREFIX.toString()
 			+ ChatColor.AQUA
 			+ "You"
@@ -100,6 +104,52 @@ public class Message {
 			+ "Worlds with OhNoez death recovery ("
 			+ ChatColor.GREEN
 			+ "%1$s"
+			+ ChatColor.WHITE
+			+ ")");
+	public static Message SHEEP_REFRESH_MESSAGE = new Message("SHEEP_REFRESH_MESSAGE", PREFIX
+			+ "Sheep refresh set to ("
+			+ ChatColor.GREEN
+			+ "%1$d seconds"
+			+ ChatColor.WHITE
+			+ ")");
+	public static Message WORLD_CREATED_MESSAGE = new Message("WORLD_CREATED_MESSAGE", PREFIX
+			+ "Created world ("
+			+ ChatColor.GREEN
+			+ "%1$s"
+			+ ChatColor.WHITE
+			+ ")");
+	public static Message WORLD_DELETED_MESSAGE = new Message("WORLD_DELETED_MESSAGE", PREFIX
+			+ "Deleted world ("
+			+ ChatColor.RED
+			+ "%1$s"
+			+ ChatColor.WHITE
+			+ ")");
+	public static Message WORLD_LIST_MESSAGE = new Message("WORLD_LIST_MESSAGE", PREFIX + "Loaded worlds (%1$s" + ChatColor.WHITE + ")");
+	public static Message WORLD_UNKNOWN_MESSAGE = new Message("WORLD_UNKNOWN_MESSAGE", PREFIX
+			+ "Unknown World ("
+			+ ChatColor.RED
+			+ "%1$s"
+			+ ChatColor.WHITE
+			+ ")");
+	public static Message WORLD_TELEPORT_MESSAGE = new Message("WORLD_TELEPORT_MESSAGE", PREFIX
+			+ "Teleporting you to ("
+			+ ChatColor.GREEN
+			+ "%1$s"
+			+ ChatColor.WHITE
+			+ ")");
+	public static Message WORLD_DELAY_MESSAGE = new Message("WORLD_DELAY_MESSAGE", PREFIX
+			+ "Time to teleport ("
+			+ ChatColor.GREEN
+			+ "%1$d"
+			+ ChatColor.WHITE
+			+ " seconds)");
+	public static Message WORLD_CHILDREN_MESSAGE = new Message("WORLD_CHILDREN_MESSAGE", PREFIX
+			+ "Inventory children for "
+			+ ChatColor.GREEN
+			+ "%1$s "
+			+ ChatColor.WHITE
+			+ "("
+			+ "%2$s"
 			+ ChatColor.WHITE
 			+ ")");
 
@@ -115,7 +165,7 @@ public class Message {
 		values.put(ICE_QUANTITY_MESSAGE.getKey(), ICE_QUANTITY_MESSAGE);
 		values.put(LACK_PERMISSION_MESSAGE.getKey(), LACK_PERMISSION_MESSAGE);
 		values.put(SHOW_EXPERIENCE_MESSAGE.getKey(), SHOW_EXPERIENCE_MESSAGE);
-		values.put(PREFIX.getKey(), PREFIX);
+		values.put(INSUFFICIENT_EXPERIENCE_MESSAGE.getKey(), INSUFFICIENT_EXPERIENCE_MESSAGE);
 		values.put(LIST_ITEM_MESSAGE.getKey(), LIST_ITEM_MESSAGE);
 		values.put(NO_ITEMS_MESSAGE.getKey(), NO_ITEMS_MESSAGE);
 		values.put(AVAILABLE_CREDITS_MESSAGE.getKey(), AVAILABLE_CREDITS_MESSAGE);
@@ -124,6 +174,13 @@ public class Message {
 		values.put(OTHER_PLAYER_DEATH_MESSAGE.getKey(), OTHER_PLAYER_DEATH_MESSAGE);
 		values.put(PLAYER_DEATH_MESSAGE.getKey(), PLAYER_DEATH_MESSAGE);
 		values.put(OHNOEZ_WORLDS_MESSAGE.getKey(), OHNOEZ_WORLDS_MESSAGE);
+		values.put(SHEEP_REFRESH_MESSAGE.getKey(), SHEEP_REFRESH_MESSAGE);
+		values.put(WORLD_CREATED_MESSAGE.getKey(), WORLD_CREATED_MESSAGE);
+		values.put(WORLD_DELETED_MESSAGE.getKey(), WORLD_DELETED_MESSAGE);
+		values.put(WORLD_LIST_MESSAGE.getKey(), WORLD_LIST_MESSAGE);
+		values.put(WORLD_UNKNOWN_MESSAGE.getKey(), WORLD_UNKNOWN_MESSAGE);
+		values.put(WORLD_DELAY_MESSAGE.getKey(), WORLD_DELAY_MESSAGE);
+		values.put(WORLD_CHILDREN_MESSAGE.getKey(), WORLD_CHILDREN_MESSAGE);
 	}
 
 	private final String key;

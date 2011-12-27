@@ -1,5 +1,5 @@
 name: TheNeedfuls
-version: 0.2
+version: 0.4
 author: Selurgniman
 main: org.selurgniman.bukkit.theneedfuls.TheNeedfuls
 
@@ -29,6 +29,13 @@ commands:
         usage:  |
             /<command> [quantity] [1-64]
             Example: /<command> quantity 32 - set the stack size of the dispensed ice to 32.
+    tns:
+        description: Set TheNeedfuls sheep options.
+        permission: theneedfuls.sheep
+        usage:  |
+            /<command> refresh [time in seconds]
+            Example: /<command> refresh - display the current refresh rate.
+            Example: /<command> refresh 30 - set the refresh rate to 30 seconds.
     tnx:
         description: Set TheNeedfuls experience options.
         permission: theneedfuls.xp
@@ -38,6 +45,17 @@ commands:
             Example: /<command> give <player> 5 - add 5 levels to the player.
             Example: /<command> take <player> 5 - remove 5 levels from the player.
             Example: /<command> set <player> 5 - set the player's level to 5.
+    tnw:
+        description: Set TheNeedfuls worlds options.
+        permission: theneedfuls.worlds
+        usage:  |
+            /<command> [create|delete|list|port] [world_name]
+            Example: /<command> create world_name - create a new world named "world_name".
+            Example: /<command> delete world_uuid - delete the world with the given uuid.
+            Example: /<command> list - list all worlds and their uuid.
+            Example: /<command> port world_name - teleport to world "world_name".
+            Example: /<command> delay 300 - sets the teleport delay to 300 seconds.
+            Example: /<command> delay - shows the delay between teleporter uses.
     ohnoez:
         description: Set TheNeedfuls ohnoez options.
         permission: theneedfuls.ohnoez
@@ -57,11 +75,13 @@ permissions:
         description: Gives access to all TheNeedfuls commands.
         default: op
         children:
-        	theneedfuls.help.*: true
+            theneedfuls.help.*: true
             theneedfuls.torch.*: true
             theneedfuls.ice.*: true
             theneedfuls.xp.*: true
+            theneedfuls.sheep.*: true
             theneedfuls.ohnoez.*: true
+            theneedfuls.worlds.*: true
     theneedfuls.help.*:
         description: Gives access to all TheNeedfuls help commands.
         default: true
@@ -85,6 +105,11 @@ permissions:
         default: op
         children:
             theneedfuls.ice.quantity: true
+    theneedfuls.sheep.*:
+        description: Gives access to all TheNeedfuls sheep commands.
+        default: op
+        children:
+            theneedfuls.sheep.refresh: true
     theneedfuls.xp.*:
         description: Gives access to all TheNeedfuls experience commands.
         default: op
@@ -93,6 +118,15 @@ permissions:
             theneedfuls.xp.give: true
             theneedfuls.xp.take: true
             theneedfuls.xp.set: true
+    theneedfuls.worlds.*:
+        description: Gives access to all TheNeedfuls worlds commands.
+        default: op
+        children:
+            theneedfuls.worlds.create: true
+            theneedfuls.worlds.delete: true
+            theneedfuls.worlds.list: true
+            theneedfuls.worlds.port: true
+            theneedfuls.worlds.delay: true
     theneedfuls.ohnoez.*:
         description: Gives access to all TheNeedfuls ohnoez commands.
         default: op
@@ -138,17 +172,35 @@ permissions:
         description: Allows you to see a player's experience level.
         default: true
     theneedfuls.xp.give:
-        description: Allows you to give a player experience levels.
-        default: op
+        description: Allows you to give a player some of your experience levels.
+        default: true
     theneedfuls.xp.take:
         description: Allows you to take experience levels from a player.
         default: op
     theneedfuls.xp.set:
         description: Allows you to set another player's experience level.
         default: op
+    theneedfuls.world.create:
+        description: Allows you to create new worlds.
+        default: true
+    theneedfuls.worlds.delete:
+        description: Allows you to delete worlds.
+        default: true
+    theneedfuls.worlds.list:
+        description: Allows you to list all loaded worlds and their UUID.
+        default: true
+    theneedfuls.worlds.port:
+        description: Allows you to port to a given world.
+        default: op
+    theneedfuls.worlds.delay:
+        description: Allows you to view and set the delay between teleporter uses.
+        default: op
+    theneedfuls.sheep.refresh:
+        description: Allows you to set the sheep unshearing refresh rate.
+        default: op
     theneedfuls.ohnoez.list:
-        description: Allows you to list your last store death inventory.
-        default: yes
+        description: Allows you to list your last stored death inventory.
+        default: true
     theneedfuls.ohnoez.credits.*:
         description: Gives access to all TheNeedfuls ohnoez credit commands.
         default: op

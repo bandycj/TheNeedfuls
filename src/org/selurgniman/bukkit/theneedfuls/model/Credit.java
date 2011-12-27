@@ -37,9 +37,6 @@ public class Credit {
 
 	private Date lastCredit;
 	
-	@NotEmpty
-	private String worldUuid;
-	
 	@OneToMany(mappedBy="credit",cascade=CascadeType.ALL)
 	private List<Drop> drops;
 
@@ -93,13 +90,5 @@ public class Credit {
 
 	public void setDrops(List<Drop> drops) {
 		this.drops = drops;
-	}
-
-	public String getWorldUuid() {
-		return worldUuid;
-	}
-
-	public void setWorldUuid(String worldUuid) {
-		this.worldUuid = worldUuid;
 	}
 }

@@ -3,11 +3,18 @@
  */
 package org.selurgniman.bukkit.theneedfuls.commands;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
+import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.selurgniman.bukkit.theneedfuls.Message;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
+import org.selurgniman.bukkit.theneedfuls.helpers.Message;
 
 /**
  * @author <a href="mailto:e83800@wnco.com">Chris Bandy</a> Created on: Dec 22,
@@ -31,19 +38,24 @@ public abstract class AbstractCommand implements CommandExecutor {
 	 */
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if (subCommands == null)
+		if (subCommands == null) {
 			return false;
+		}
 
 		ISubCommand operation = null;
 		try {
 			for (ISubCommand subCommand : subCommands) {
 				if (subCommand.toString().equals(args[0].toUpperCase())) {
 					operation = subCommand;
+					break;
 				}
 			}
 		} catch (IllegalArgumentException ex) {
 			return false;
 		} catch (ArrayIndexOutOfBoundsException ex) {
+			return false;
+		}
+		if (operation == null) {
 			return false;
 		}
 
@@ -61,7 +73,9 @@ public abstract class AbstractCommand implements CommandExecutor {
 
 		if (!option.isEmpty() && plugin.getServer().getPlayer(option) == null) {
 			if (!sender.hasPermission(command.getPermission() + "." + operation.toString().toLowerCase() + "." + option)) {
-				sender.sendMessage(String.format(Message.LACK_PERMISSION_MESSAGE.toString(), command.getPermission(), operation.toString().toLowerCase()+"."+option));
+				sender.sendMessage(String.format(Message.LACK_PERMISSION_MESSAGE.toString(), command.getPermission(), operation.toString().toLowerCase()
+						+ "."
+						+ option));
 				return false;
 			}
 		} else if (!sender.hasPermission(command.getPermission() + "." + operation.toString().toLowerCase())) {
@@ -76,5 +90,53 @@ public abstract class AbstractCommand implements CommandExecutor {
 
 	public void setSubCommands(ISubCommand[] subCommands) {
 		this.subCommands = subCommands;
+	}
+
+	public String getWorldsList(String configKey) {
+		List<World> worlds = new ArrayList<World>();
+		for (String worldId : plugin.getConfig().getStringList(configKey)) {
+			worlds.add(plugin.getServer().getWorld(UUID.fromString(worldId)));
+		}
+		return getWorldsList(worlds);
+	}
+
+	public String getWorldsList(List<World> worlds) {
+		List<String> worldNames = new ArrayList<String>();
+		for (World world : worlds) {
+			if (world != null) {
+				switch (world.getEnvironment()) {
+					case NORMAL: {
+						worldNames.add(ChatColor.GREEN + world.getName() + ":" + world.getUID() + ChatColor.WHITE);
+						break;
+					}
+					case NETHER: {
+						worldNames.add(ChatColor.RED + world.getName() + ":" + world.getUID() + ChatColor.WHITE);
+						break;
+					}
+					case THE_END: {
+						worldNames.add(ChatColor.DARK_BLUE + world.getName() + ":" + world.getUID() + ChatColor.WHITE);
+						break;
+					}
+				}
+			}
+		}
+		return worldNames.toString().replace("[", "").replace("]", "");
+	}
+
+	public void addRemoveWorld(String option, String worldId, String worldsKey) {
+		List<String> worldIds = plugin.getConfig().getStringList(worldsKey);
+		World world = plugin.getServer().getWorld(worldId);
+		int worldIndex = Collections.binarySearch(worldIds, world.getUID().toString());
+
+		if (option.equalsIgnoreCase("add") && worldIndex < 0) {
+			worldIds.add(world.getUID().toString());
+			Collections.sort(worldIds);
+		} else if (option.equalsIgnoreCase("remove") && worldIndex > -1) {
+			worldIds.remove(worldIndex);
+		}
+
+		plugin.getConfig().set(worldsKey, worldIds);
+		plugin.saveConfig();
+		plugin.getModel().loadWorldControls();
 	}
 }

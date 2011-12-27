@@ -3,17 +3,11 @@
  */
 package org.selurgniman.bukkit.theneedfuls.commands;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
 import org.bukkit.ChatColor;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.selurgniman.bukkit.theneedfuls.Message;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
+import org.selurgniman.bukkit.theneedfuls.helpers.Message;
 import org.selurgniman.bukkit.theneedfuls.model.Torch;
 
 /**
@@ -48,6 +42,7 @@ public class TorchCommand extends AbstractCommand {
 					try {
 						plugin.getConfig().set(Torch.TORCH_AGE_KEY, Integer.parseInt(option));
 						plugin.saveConfig();
+						plugin.getModel().loadWorldControls();
 						plugin.initTorchTask();
 					} catch (NumberFormatException ex) {
 
@@ -60,6 +55,7 @@ public class TorchCommand extends AbstractCommand {
 					try {
 						plugin.getConfig().set(Torch.TORCH_REFRESH_KEY, Integer.parseInt(option));
 						plugin.saveConfig();
+						plugin.getModel().loadWorldControls();
 						plugin.initTorchTask();
 					} catch (NumberFormatException ex) {
 
@@ -86,43 +82,11 @@ public class TorchCommand extends AbstractCommand {
 				}
 				case WORLDS: {
 					if (args.length > 2) {
-						List<String> worldIds = plugin.getConfig().getStringList(Torch.TORCH_WORLDS_KEY);
-						World world = plugin.getServer().getWorld(args[2]);
-						int worldIndex = Collections.binarySearch(worldIds, world.getUID().toString());
-
-						if (option.equalsIgnoreCase("add") && worldIndex < 0) {
-							worldIds.add(world.getUID().toString());
-							Collections.sort(worldIds);
-						} else if (option.equalsIgnoreCase("remove") && worldIndex > -1) {
-							worldIds.remove(worldIndex);
-						}
-
-						plugin.getConfig().set(Torch.TORCH_WORLDS_KEY, worldIds);
-						plugin.saveConfig();
+						addRemoveWorld(option,args[2],Torch.TORCH_WORLDS_KEY);
 					}
-
-					List<String> worlds = new ArrayList<String>();
-					for (String worldId : plugin.getConfig().getStringList(Torch.TORCH_WORLDS_KEY)) {
-						World world = plugin.getServer().getWorld(UUID.fromString(worldId));
-						if (world != null) {
-							switch (world.getEnvironment()) {
-								case NORMAL: {
-									worlds.add(ChatColor.GREEN + world.getName() + ChatColor.WHITE);
-									break;
-								}
-								case NETHER: {
-									worlds.add(ChatColor.RED + world.getName() + ChatColor.WHITE);
-									break;
-								}
-								case THE_END: {
-									worlds.add(ChatColor.DARK_BLUE + world.getName() + ChatColor.WHITE);
-									break;
-								}
-							}
-						}
-					}
-
-					sender.sendMessage(String.format(Message.TORCH_WORLDS_MESSAGE.toString(), worlds).replace("[", "").replace("]", ""));
+					plugin.getModel().loadWorldControls();
+					plugin.initTorchTask();
+					sender.sendMessage(String.format(Message.TORCH_WORLDS_MESSAGE.toString(), getWorldsList(Torch.TORCH_WORLDS_KEY)));
 					return true;
 				}
 

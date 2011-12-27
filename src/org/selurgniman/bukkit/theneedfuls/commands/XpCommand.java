@@ -7,8 +7,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.selurgniman.bukkit.theneedfuls.Message;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
+import org.selurgniman.bukkit.theneedfuls.helpers.Message;
 
 /**
  * @author <a href="mailto:selurgniman@selurgniman.org">Selurgniman</a> Created
@@ -24,6 +24,7 @@ public class XpCommand extends AbstractCommand {
 	public XpCommand(TheNeedfuls plugin) {
 		super(plugin);
 		this.plugin = plugin;
+		this.setSubCommands(XpSubCommand.values());
 	}
 
 	/*
@@ -41,6 +42,7 @@ public class XpCommand extends AbstractCommand {
 				try {
 					amount = Integer.parseInt(args[2]);
 				} catch (NumberFormatException ex) {
+					ex.printStackTrace();
 					return false;
 				}
 			}
@@ -51,37 +53,38 @@ public class XpCommand extends AbstractCommand {
 				return true;
 			}
 
-			switch ((XpSubCommand)operation) {
+			switch ((XpSubCommand) operation) {
 				case SHOW: {
 					sender.sendMessage(String.format(Message.SHOW_EXPERIENCE_MESSAGE.toString(), player.getDisplayName(), player.getLevel()));
-					return true;
+					break;
 				}
 				case GIVE: {
-					if (amount > 0) {
-						player.setLevel(player.getLevel() + amount);
-						return true;
+					if (sender instanceof Player && !sender.equals(player) && amount > 0) {
+						if (((Player) sender).getLevel() >= amount) {
+							player.setLevel(player.getLevel() + amount);
+							((Player) sender).setLevel(((Player) sender).getLevel() - amount);
+						} else {
+							sender.sendMessage(String.format(Message.INSUFFICIENT_EXPERIENCE_MESSAGE.toString(),amount));
+						}
 					}
 					break;
 				}
 				case TAKE: {
 					if (amount > 0) {
 						player.setLevel(player.getLevel() - amount);
-						return true;
 					}
 					break;
 				}
 				case SET: {
 					if (amount > 0) {
 						player.setLevel(amount);
-						return true;
 					}
 					break;
 				}
-				default: {
-					sender.sendMessage(String.format(Message.SHOW_EXPERIENCE_MESSAGE.toString(), player.getDisplayName(), player.getLevel()));
-					break;
-				}
 			}
+			sender.sendMessage(String.format(Message.SHOW_EXPERIENCE_MESSAGE.toString(), player.getDisplayName(), player.getLevel()));
+
+			return true;
 		}
 		return false;
 	}
