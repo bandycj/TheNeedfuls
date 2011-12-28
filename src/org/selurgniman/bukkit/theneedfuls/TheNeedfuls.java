@@ -34,10 +34,10 @@ import org.selurgniman.bukkit.theneedfuls.helpers.Message;
 import org.selurgniman.bukkit.theneedfuls.listeners.TheNeedfulsBlockListener;
 import org.selurgniman.bukkit.theneedfuls.listeners.TheNeedfulsEntityListener;
 import org.selurgniman.bukkit.theneedfuls.listeners.TheNeedfulsPlayerListener;
-import org.selurgniman.bukkit.theneedfuls.model.Credit;
 import org.selurgniman.bukkit.theneedfuls.model.Model;
 import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
-import org.selurgniman.bukkit.theneedfuls.model.Torch;
+import org.selurgniman.bukkit.theneedfuls.model.dao.Credit;
+import org.selurgniman.bukkit.theneedfuls.model.dao.Torch;
 import org.selurgniman.bukkit.theneedfuls.model.TorchModel;
 
 import com.avaje.ebean.EbeanServer;

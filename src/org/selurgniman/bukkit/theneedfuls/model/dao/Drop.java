@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.selurgniman.bukkit.theneedfuls.model;
+package org.selurgniman.bukkit.theneedfuls.model.dao;
 
 import java.util.ArrayList;
 import java.util.List;

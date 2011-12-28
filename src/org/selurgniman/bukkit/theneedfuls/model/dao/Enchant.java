@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.selurgniman.bukkit.theneedfuls.model;
+package org.selurgniman.bukkit.theneedfuls.model.dao;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -17,15 +17,15 @@ import com.avaje.ebean.validation.NotNull;
  *         on: Dec 23, 2011
  */
 @Entity()
-@Table(name = "theneedfuls_inventory_enchants")
-public class InventoryEnchant {
+@Table(name = "ohnoez_enchants")
+public class Enchant {
 
 	@Id
 	private Integer id;
 
 	@ManyToOne(cascade = CascadeType.REFRESH)
 	@JoinColumn(name = "enchants")
-	private InventoryItem item;
+	private Drop drop;
 
 	@NotNull
 	private Integer enchantId;
@@ -33,14 +33,14 @@ public class InventoryEnchant {
 	@NotNull
 	private Integer enchantLevel;
 
-	public InventoryEnchant() {
+	public Enchant() {
 		this(0, 0, null);
 	}
 
-	public InventoryEnchant(int enchantId, int enchantLevel, InventoryItem item) {
+	public Enchant(int enchantId, int enchantLevel, Drop drop) {
 		this.enchantId = enchantId;
 		this.enchantLevel = enchantLevel;
-		this.item = item;
+		this.drop = drop;
 	}
 
 	/**
@@ -61,16 +61,16 @@ public class InventoryEnchant {
 	/**
 	 * @return the drop
 	 */
-	public InventoryItem getItem() {
-		return item;
+	public Drop getDrop() {
+		return drop;
 	}
 
 	/**
 	 * @param drop
 	 *            the drop to set
 	 */
-	public void setItem(InventoryItem item) {
-		this.item = item;
+	public void setDrop(Drop drop) {
+		this.drop = drop;
 	}
 
 	/**

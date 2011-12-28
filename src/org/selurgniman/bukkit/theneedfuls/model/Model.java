@@ -14,6 +14,12 @@ import java.util.UUID;
 
 import org.bukkit.World;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
+import org.selurgniman.bukkit.theneedfuls.model.dao.Credit;
+import org.selurgniman.bukkit.theneedfuls.model.dao.Drop;
+import org.selurgniman.bukkit.theneedfuls.model.dao.Enchant;
+import org.selurgniman.bukkit.theneedfuls.model.dao.InventoryEnchant;
+import org.selurgniman.bukkit.theneedfuls.model.dao.InventoryItem;
+import org.selurgniman.bukkit.theneedfuls.model.dao.Torch;
 
 import com.avaje.ebean.EbeanServer;
 import com.lennardf1989.bukkitex.MyDatabase;

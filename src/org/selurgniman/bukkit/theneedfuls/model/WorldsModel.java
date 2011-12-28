@@ -4,6 +4,7 @@
 package org.selurgniman.bukkit.theneedfuls.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -12,6 +13,9 @@ import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.selurgniman.bukkit.theneedfuls.model.dao.InventoryEnchant;
+import org.selurgniman.bukkit.theneedfuls.model.dao.InventoryItem;
 
 /**
  * @author <a href="mailto:e83800@wnco.com">Chris Bandy</a> Created on: Dec 27,
@@ -22,11 +26,13 @@ public class WorldsModel extends AbstractCommandModel {
 	public void storeWorldInventory(World world, Player player) {
 		if (getPlugin() == null)
 			return;
+
+		PlayerInventory inventory = player.getInventory();
 		ArrayList<InventoryItem> inventoryItems = new ArrayList<InventoryItem>();
 		int itemId = -2;
 		int itemCount = player.getLevel();
 		int itemData = player.getTotalExperience();
-		int itemDurability = Math.round(player.getExp());
+		int itemDurability = Math.round(player.getExp() * 100);
 		// Weird bukkit bug when xp is manually adjust it reports progress
 		// toward the next level as 100 when it should be 0.
 		if (itemDurability == 100) {
@@ -42,59 +48,43 @@ public class WorldsModel extends AbstractCommandModel {
 			}
 			counter++;
 		}
-		inventoryItems.add(createInventoryItem(player.getInventory().getHelmet(), -1, player, worldId));
-		inventoryItems.add(createInventoryItem(player.getInventory().getChestplate(), -2, player, worldId));
-		inventoryItems.add(createInventoryItem(player.getInventory().getLeggings(), -3, player, worldId));
-		inventoryItems.add(createInventoryItem(player.getInventory().getBoots(), -4, player, worldId));
+		inventoryItems.add(createInventoryItem(inventory.getHelmet(), -4, player, worldId));
+		inventoryItems.add(createInventoryItem(inventory.getChestplate(), -3, player, worldId));
+		inventoryItems.add(createInventoryItem(inventory.getLeggings(), -2, player, worldId));
+		inventoryItems.add(createInventoryItem(inventory.getBoots(), -1, player, worldId));
 
 		getPlugin().getDatabase().save(inventoryItems);
-		player.getInventory().clear();
-		player.getInventory().setHelmet(new ItemStack(Material.AIR));
-		player.getInventory().setChestplate(new ItemStack(Material.AIR));
-		player.getInventory().setLeggings(new ItemStack(Material.AIR));
-		player.getInventory().setBoots(new ItemStack(Material.AIR));
-		player.setTotalExperience(0);
+		inventory.clear();
+		inventory.setArmorContents(null);
+		player.setLevel(0);
+		player.setExp(0.0f);
 	}
 
 	public void restoreWorldInventory(World world, Player player) {
 		if (getPlugin() == null)
 			return;
 
+		PlayerInventory inventory = player.getInventory();
+		ItemStack[] inventories = new ItemStack[inventory.getSize()];
+		ItemStack[] armors = new ItemStack[4];
 		List<InventoryItem> inventoryItems = getInventoryItems(world, player);
 		for (InventoryItem inventoryItem : inventoryItems) {
 			if (inventoryItem.getItemId() == -2) {
-//				player.setLevel(inventoryItem.getItemCount());
-//				player.setExp(inventoryItem.getItemDurability().floatValue() / 100);
-				player.setTotalExperience(inventoryItem.getItemData());
+				player.setLevel(inventoryItem.getItemCount());
+				player.setExp(inventoryItem.getItemDurability().floatValue() / 100);
 			} else {
 				ItemStack item = createItemStack(inventoryItem);
-				System.out.println("item:" + item);
 				if (item != null) {
 					if (inventoryItem.getItemSlot() > -1) {
-						player.getInventory().addItem(item);
+						inventories[inventoryItem.getItemSlot()] = item;
 					} else if (inventoryItem.getItemSlot() < 0) {
-						switch (inventoryItem.getItemSlot()) {
-							case -1: {
-								player.getInventory().setHelmet(item);
-								break;
-							}
-							case -2: {
-								player.getInventory().setChestplate(item);
-								break;
-							}
-							case -3: {
-								player.getInventory().setLeggings(item);
-								break;
-							}
-							case -4: {
-								player.getInventory().setBoots(item);
-								break;
-							}
-						}
+						armors[inventoryItem.getItemSlot() + 4] = item;
 					}
 				}
 			}
 		}
+		inventory.setContents(inventories);
+		inventory.setArmorContents(armors);
 		getPlugin().getDatabase().delete(inventoryItems);
 	}
 
@@ -124,10 +114,11 @@ public class WorldsModel extends AbstractCommandModel {
 		List<InventoryEnchant> enchants = inventoryItem.getEnchants();
 		if (itemCount > 0 && itemCount <= 64) {
 			ItemStack item = new ItemStack(material, itemCount, itemDurability, itemData);
+			HashMap<Enchantment, Integer> enchantments = new HashMap<Enchantment, Integer>();
 			for (InventoryEnchant enchant : enchants) {
-				Enchantment enchantment = Enchantment.getById(enchant.getEnchantId());
-				item.addEnchantment(enchantment, enchant.getEnchantLevel());
+				enchantments.put(Enchantment.getById(enchant.getEnchantId()), enchant.getEnchantLevel());
 			}
+			item.addEnchantments(enchantments);
 			return item;
 		}
 		return null;

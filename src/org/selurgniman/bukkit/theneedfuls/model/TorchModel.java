@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
+import org.selurgniman.bukkit.theneedfuls.model.dao.Torch;
 
 /**
  * @author <a href="mailto:e83800@wnco.com">Chris Bandy</a> Created on: Dec 27,

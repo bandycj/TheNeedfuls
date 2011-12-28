@@ -22,6 +22,9 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.selurgniman.bukkit.theneedfuls.helpers.Message;
+import org.selurgniman.bukkit.theneedfuls.model.dao.Credit;
+import org.selurgniman.bukkit.theneedfuls.model.dao.Drop;
+import org.selurgniman.bukkit.theneedfuls.model.dao.Enchant;
 
 /**
  * @author <a href="mailto:e83800@wnco.com">Chris Bandy</a> Created on: Dec 27,

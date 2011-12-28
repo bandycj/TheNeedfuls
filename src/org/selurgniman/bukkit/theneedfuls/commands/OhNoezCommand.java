@@ -17,9 +17,9 @@ import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
 import org.selurgniman.bukkit.theneedfuls.helpers.InkSackHelper;
 import org.selurgniman.bukkit.theneedfuls.helpers.Message;
 import org.selurgniman.bukkit.theneedfuls.helpers.PotionHelper;
-import org.selurgniman.bukkit.theneedfuls.model.Credit;
 import org.selurgniman.bukkit.theneedfuls.model.Model;
 import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
+import org.selurgniman.bukkit.theneedfuls.model.dao.Credit;
 import org.selurgniman.bukkit.theneedfuls.model.OhNoezModel;
 
 /**
