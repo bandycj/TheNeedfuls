@@ -81,7 +81,7 @@
               <version>${version}</version>
               <type>jar</type>
               <overWrite>true</overWrite>
-              <outputDirectory>E:\mc\plugins</outputDirectory>
+              <outputDirectory>D:\minecraft_stuff\Minecraft_server\plugins</outputDirectory>
               <destFileName>${artifactId}.jar</destFileName>
             </artifactItem>
           </artifactItems>
