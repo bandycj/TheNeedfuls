@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldCreator;
@@ -40,6 +41,7 @@ import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
 import org.selurgniman.bukkit.theneedfuls.model.TorchModel;
 import org.selurgniman.bukkit.theneedfuls.model.dao.Credit;
 import org.selurgniman.bukkit.theneedfuls.model.dao.Torch;
+import org.selurgniman.bukkit.theneedfuls.recipes.GlowstoneRecipe;
 
 import com.avaje.ebean.EbeanServer;
 
@@ -78,28 +80,53 @@ public class TheNeedfuls extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		this.plugin = this;
-		String[] worlds=this.plugin.getServer().getWorldContainer().list(new FilenameFilter(){
+		
+		loadWorlds();
+		initConfig();
+
+		this.model = new Model(this);
+		setupDatabase();
+
+		registerEvents();
+		setCommandExecutors();
+
+		addRecipes();
+		initTorchTask();
+		initSheepTask();
+
+		saveConfig();
+		PluginDescriptionFile pdfFile = this.getDescription();
+		log.info(Message.PREFIX + pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled!");
+	}
+
+	private void loadWorlds() {
+		String[] worlds = this.plugin.getServer().getWorldContainer().list(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
-				File subDir = new File(dir,name);
-				if (subDir.isDirectory()){
-					for (File file:subDir.listFiles()){
-						if (file.getName().equalsIgnoreCase("level.dat")){
+				File subDir = new File(dir, name);
+				if (subDir.isDirectory()) {
+					for (File file : subDir.listFiles()) {
+						if (file.getName().equalsIgnoreCase("level.dat")) {
 							return true;
 						}
 					}
 				}
-				
+
 				return false;
 			}
 		});
-		for (String world:worlds){
-			if (this.getServer().getWorld(world) == null){
-				WorldCreator creator=new WorldCreator(world);
+		int counter = 0;
+		for (String world : worlds) {
+			if (this.getServer().getWorld(world) == null) {
+				WorldCreator creator = new WorldCreator(world);
 				this.getServer().createWorld(creator);
+				counter++;
 			}
 		}
-		
+		log.info(Message.PREFIX + " loaded " + ChatColor.GREEN + counter + ChatColor.WHITE + " worlds.");
+	}
+
+	private void initConfig() {
 		if (!this.getDataFolder().exists()) {
 			this.getDataFolder().mkdir();
 		}
@@ -110,10 +137,21 @@ public class TheNeedfuls extends JavaPlugin {
 		}
 
 		Message.setConfig(this.getConfig());
+		log.info(Message.PREFIX + " config initialized.");
+	}
 
-		this.model = new Model(this);
-		setupDatabase();
-		
+	private void setupDatabase() {
+		try {
+			for (Class<?> dbClass:model.getDaoClasses()){
+				model.getDatabase().find(dbClass).findRowCount();
+			}
+		} catch (PersistenceException ex) {
+			log.info("Installing database for " + getDescription().getName() + " due to first time usage");
+			installDDL();
+		}
+	}
+
+	private void registerEvents() {
 		PluginManager pm = getServer().getPluginManager();
 		TheNeedfulsEntityListener entityListener = new TheNeedfulsEntityListener(model);
 		TheNeedfulsBlockListener blockListener = new TheNeedfulsBlockListener(this);
@@ -128,10 +166,10 @@ public class TheNeedfuls extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener, Priority.Normal, this);
+		log.info(Message.PREFIX + " registered event listeners.");
+	}
 
-		initTorchTask();
-		initSheepTask();
-		
+	private void setCommandExecutors() {
 		this.getCommand("tnh").setExecutor(new HelpCommand(this));
 		this.getCommand("tnt").setExecutor(new TorchCommand(this));
 		this.getCommand("tni").setExecutor(new IceCommand(this));
@@ -140,20 +178,12 @@ public class TheNeedfuls extends JavaPlugin {
 		this.getCommand("tnw").setExecutor(new WorldsCommand(this));
 		this.getCommand("ohnoez").setExecutor(new OhNoezCommand(this));
 		this.getCommand("sort").setExecutor(new SortCommand(this));
-
-		saveConfig();
-		PluginDescriptionFile pdfFile = this.getDescription();
-		log.info(Message.PREFIX + pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled!");
+		log.info(Message.PREFIX + " set command executors.");
 	}
 
-	private void setupDatabase() {
-		try {
-			model.getDatabase().find(Torch.class).findRowCount();
-
-		} catch (PersistenceException ex) {
-			log.info("Installing database for " + getDescription().getName() + " due to first time usage");
-			installDDL();
-		}
+	private void addRecipes() {
+		this.getServer().addRecipe(new GlowstoneRecipe());
+		log.info(Message.PREFIX + " loaded recipes.");
 	}
 
 	public void initTorchTask() {
@@ -164,11 +194,12 @@ public class TheNeedfuls extends JavaPlugin {
 		torchTaskId = this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
 			@Override
 			public void run() {
-				((TorchModel)Model.getCommandModel(CommandType.TORCH)).expireTorches();
+				((TorchModel) Model.getCommandModel(CommandType.TORCH)).expireTorches();
 			}
 		}, 60L, this.getConfig().getLong(Torch.TORCH_REFRESH_KEY) * 20);
+		log.info(Message.PREFIX + " torch expiration task started with id "+torchTaskId+".");
 	}
-	
+
 	/**
 	 * Workaround for minecraft bug that causes sheep not to regrow wool.
 	 */
@@ -179,14 +210,14 @@ public class TheNeedfuls extends JavaPlugin {
 		sheepTaskId = this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
 			@Override
 			public void run() {
-				for (World world:plugin.getServer().getWorlds()){
-					if (world.getEnvironment() == Environment.NORMAL){
-						for (LivingEntity livingEntity:world.getLivingEntities()){
-							if (livingEntity instanceof Sheep){
-								Sheep sheep = (Sheep)livingEntity;
-								if (sheep.isSheared()){
+				for (World world : plugin.getServer().getWorlds()) {
+					if (world.getEnvironment() == Environment.NORMAL) {
+						for (LivingEntity livingEntity : world.getLivingEntities()) {
+							if (livingEntity instanceof Sheep) {
+								Sheep sheep = (Sheep) livingEntity;
+								if (sheep.isSheared()) {
 									Random r = new Random();
-									sheep.setSheared(r.nextInt(1000)%3==0);
+									sheep.setSheared(r.nextInt(1000) % 3 == 0);
 								}
 							}
 						}
@@ -194,6 +225,7 @@ public class TheNeedfuls extends JavaPlugin {
 				}
 			}
 		}, 60L, this.getConfig().getLong("sheep.refresh") * 20);
+		log.info(Message.PREFIX + " sheep unshearing task started with id "+sheepTaskId+".");
 	}
 
 	public Model getModel() {

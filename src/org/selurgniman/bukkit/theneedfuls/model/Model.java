@@ -65,14 +65,7 @@ public class Model {
 		this.myDatabase = new MyDatabase(plugin) {
 			@Override
 			protected java.util.List<Class<?>> getDatabaseClasses() {
-				List<Class<?>> list = new ArrayList<Class<?>>();
-				list.add(Torch.class);
-				list.add(Credit.class);
-				list.add(Drop.class);
-				list.add(Enchant.class);
-				list.add(InventoryItem.class);
-				list.add(InventoryEnchant.class);
-				return list;
+				return getDaoClasses();
 			};
 		};
 		this.myDatabase.initializeDatabase(plugin.getConfig().getString(DATABASE_DRIVER), plugin.getConfig().getString(DATABASE_URL), plugin
@@ -96,6 +89,17 @@ public class Model {
 		}
 		addCommandWorlds(CommandType.TORCH, Torch.TORCH_WORLDS_KEY);
 		addCommandWorlds(CommandType.OHNOEZ, Credit.OHNOEZ_WORLDS_KEY);
+	}
+	
+	public List<Class<?>> getDaoClasses(){
+		List<Class<?>> list = new ArrayList<Class<?>>();
+		list.add(Torch.class);
+		list.add(Credit.class);
+		list.add(Drop.class);
+		list.add(Enchant.class);
+		list.add(InventoryItem.class);
+		list.add(InventoryEnchant.class);
+		return list;
 	}
 
 	private void addCommandWorlds(CommandType command, String key) {
