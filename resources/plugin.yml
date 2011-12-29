@@ -69,6 +69,12 @@ commands:
             Example: /<command> worlds - see a list of worlds that death inventory tracking is enabled on.
             Example: /<command> worlds add world - enable death inventory tracking on world named "world".
             Example: /<command> worlds remove world - disable death inventory tracking on world named "world".
+    sort:
+        description: Sort your inventory or the targeted object's inventory.
+        permission: theneedfuls.sort
+        aliases: [s]
+        usage:  |
+            Example: /<command> - Sort your inventory or the targeted object's inventory.
 
 permissions:
     theneedfuls.*:
@@ -82,6 +88,7 @@ permissions:
             theneedfuls.sheep.*: true
             theneedfuls.ohnoez.*: true
             theneedfuls.worlds.*: true
+            theneedfuls.sort: true
     theneedfuls.help.*:
         description: Gives access to all TheNeedfuls help commands.
         default: true
@@ -137,6 +144,9 @@ permissions:
             theneedfuls.ohnoez.worlds: true
     theneedfuls.help.help:
         description: Allows you to see help for help.
+        default: true
+    theneedfuls.sort:
+        description: Allows you to sort inventories.
         default: true
     theneedfuls.help.torch:
         description: Allows you to see help for torch.

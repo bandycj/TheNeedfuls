@@ -27,6 +27,7 @@ import org.selurgniman.bukkit.theneedfuls.commands.HelpCommand;
 import org.selurgniman.bukkit.theneedfuls.commands.IceCommand;
 import org.selurgniman.bukkit.theneedfuls.commands.OhNoezCommand;
 import org.selurgniman.bukkit.theneedfuls.commands.SheepCommand;
+import org.selurgniman.bukkit.theneedfuls.commands.SortCommand;
 import org.selurgniman.bukkit.theneedfuls.commands.TorchCommand;
 import org.selurgniman.bukkit.theneedfuls.commands.WorldsCommand;
 import org.selurgniman.bukkit.theneedfuls.commands.XpCommand;
@@ -36,9 +37,9 @@ import org.selurgniman.bukkit.theneedfuls.listeners.TheNeedfulsEntityListener;
 import org.selurgniman.bukkit.theneedfuls.listeners.TheNeedfulsPlayerListener;
 import org.selurgniman.bukkit.theneedfuls.model.Model;
 import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
+import org.selurgniman.bukkit.theneedfuls.model.TorchModel;
 import org.selurgniman.bukkit.theneedfuls.model.dao.Credit;
 import org.selurgniman.bukkit.theneedfuls.model.dao.Torch;
-import org.selurgniman.bukkit.theneedfuls.model.TorchModel;
 
 import com.avaje.ebean.EbeanServer;
 
@@ -55,6 +56,7 @@ public class TheNeedfuls extends JavaPlugin {
 	private int sheepTaskId = -1;
 
 	static {
+		CONFIG_DEFAULTS.put(SortCommand.CONFIG_SORT_DISTANCE, 5);
 		CONFIG_DEFAULTS.put(IceCommand.CONFIG_ICE_QUANTITY, 64);
 		CONFIG_DEFAULTS.put(SheepCommand.CONFIG_SHEEP_REFRESH, 60);
 		CONFIG_DEFAULTS.put(WorldsCommand.CONFIG_TELEPORT_DELAY, 300);
@@ -137,6 +139,7 @@ public class TheNeedfuls extends JavaPlugin {
 		this.getCommand("tns").setExecutor(new SheepCommand(this));
 		this.getCommand("tnw").setExecutor(new WorldsCommand(this));
 		this.getCommand("ohnoez").setExecutor(new OhNoezCommand(this));
+		this.getCommand("sort").setExecutor(new SortCommand(this));
 
 		saveConfig();
 		PluginDescriptionFile pdfFile = this.getDescription();
