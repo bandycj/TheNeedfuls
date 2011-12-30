@@ -17,6 +17,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldCreator;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Sheep;
 import org.bukkit.event.Event;
@@ -35,6 +36,7 @@ import org.selurgniman.bukkit.theneedfuls.commands.XpCommand;
 import org.selurgniman.bukkit.theneedfuls.helpers.Message;
 import org.selurgniman.bukkit.theneedfuls.listeners.TheNeedfulsBlockListener;
 import org.selurgniman.bukkit.theneedfuls.listeners.TheNeedfulsEntityListener;
+import org.selurgniman.bukkit.theneedfuls.listeners.TheNeedfulsInventoryListener;
 import org.selurgniman.bukkit.theneedfuls.listeners.TheNeedfulsPlayerListener;
 import org.selurgniman.bukkit.theneedfuls.model.Model;
 import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
@@ -51,6 +53,8 @@ import com.avaje.ebean.EbeanServer;
  */
 public class TheNeedfuls extends JavaPlugin {
 	private final Logger log = Logger.getLogger("Minecraft");
+	public static final BlockFace[] BLOCKFACES = new BlockFace[] { BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.NORTH_WEST, BlockFace.EAST, BlockFace.WEST,
+			BlockFace.SOUTH, BlockFace.SOUTH_EAST, BlockFace.SOUTH_WEST };
 	private static final HashMap<String, Object> CONFIG_DEFAULTS = new HashMap<String, Object>();
 	private Model model = null;
 	private TheNeedfuls plugin = null;
@@ -80,7 +84,7 @@ public class TheNeedfuls extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		this.plugin = this;
-		
+
 		loadWorlds();
 		initConfig();
 
@@ -142,7 +146,7 @@ public class TheNeedfuls extends JavaPlugin {
 
 	private void setupDatabase() {
 		try {
-			for (Class<?> dbClass:model.getDaoClasses()){
+			for (Class<?> dbClass : model.getDaoClasses()) {
 				model.getDatabase().find(dbClass).findRowCount();
 			}
 		} catch (PersistenceException ex) {
@@ -156,17 +160,19 @@ public class TheNeedfuls extends JavaPlugin {
 		TheNeedfulsEntityListener entityListener = new TheNeedfulsEntityListener(model);
 		TheNeedfulsBlockListener blockListener = new TheNeedfulsBlockListener(this);
 		TheNeedfulsPlayerListener playerListener = new TheNeedfulsPlayerListener(this);
+		TheNeedfulsInventoryListener inventoryListener = new TheNeedfulsInventoryListener(this);
 		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.BLOCK_IGNITE, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_DISPENSE, blockListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.BLOCK_PISTON_EXTEND, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.ENTITY_INTERACT, entityListener, Priority.Low, this);
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener, Priority.Normal, this);
-		log.info(Message.PREFIX + " registered event listeners.");
+		pm.registerEvent(Event.Type.CUSTOM_EVENT, inventoryListener, Priority.Normal, this);
 	}
 
 	private void setCommandExecutors() {
@@ -178,6 +184,7 @@ public class TheNeedfuls extends JavaPlugin {
 		this.getCommand("tnw").setExecutor(new WorldsCommand(this));
 		this.getCommand("ohnoez").setExecutor(new OhNoezCommand(this));
 		this.getCommand("sort").setExecutor(new SortCommand(this));
+
 		log.info(Message.PREFIX + " set command executors.");
 	}
 
@@ -197,7 +204,7 @@ public class TheNeedfuls extends JavaPlugin {
 				((TorchModel) Model.getCommandModel(CommandType.TORCH)).expireTorches();
 			}
 		}, 60L, this.getConfig().getLong(Torch.TORCH_REFRESH_KEY) * 20);
-		log.info(Message.PREFIX + " torch expiration task started with id "+torchTaskId+".");
+		log.info(Message.PREFIX + " torch expiration task started with id " + torchTaskId + ".");
 	}
 
 	/**
@@ -225,7 +232,7 @@ public class TheNeedfuls extends JavaPlugin {
 				}
 			}
 		}, 60L, this.getConfig().getLong("sheep.refresh") * 20);
-		log.info(Message.PREFIX + " sheep unshearing task started with id "+sheepTaskId+".");
+		log.info(Message.PREFIX + " sheep unshearing task started with id " + sheepTaskId + ".");
 	}
 
 	public Model getModel() {

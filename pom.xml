@@ -102,6 +102,12 @@
 			<id>lennardf1989-repo</id>
 			<url>http://github.lennardf1989.com/repository</url>
 		</repository>
+		<repository>
+			<id>spout-repo</id>
+			<name>Spout API</name>
+			<url>http://repo.getspout.org/</url>
+			<layout>default</layout>
+		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
@@ -111,6 +117,12 @@
 		<dependency>
 			<groupId>com.lennardf1989</groupId>
 			<artifactId>bukkitex</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.getspout</groupId>
+			<artifactId>spoutpluginapi</artifactId>
+			<version>dev-SNAPSHOT</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>

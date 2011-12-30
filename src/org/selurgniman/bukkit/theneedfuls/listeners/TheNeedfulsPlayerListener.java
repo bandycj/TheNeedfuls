@@ -8,6 +8,7 @@ import java.util.IdentityHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -34,8 +35,6 @@ import org.selurgniman.bukkit.theneedfuls.model.WorldsModel;
  *         on: Dec 26, 2011
  */
 public class TheNeedfulsPlayerListener extends PlayerListener {
-	private static final BlockFace[] blockfaces = new BlockFace[] { BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.NORTH_WEST, BlockFace.EAST,
-			BlockFace.WEST, BlockFace.SOUTH, BlockFace.SOUTH_EAST, BlockFace.SOUTH_WEST };
 	private final TheNeedfuls plugin;
 	private final WorldsModel worldsModel;
 	private final Pattern signPattern = Pattern.compile("^\\[(.*)\\]$");
@@ -55,6 +54,7 @@ public class TheNeedfulsPlayerListener extends PlayerListener {
 				
 				TeleporterValidator validator = new TeleporterValidator(player,clickedBlock);
 				if (validator.isValid()) {
+					clickedBlock.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 4);
 					String worldName = validator.getWorldName();
 					World world = plugin.getServer().getWorld(worldName);
 					if (world != null && world.getEnvironment() == player.getWorld().getEnvironment()) {
@@ -187,7 +187,7 @@ public class TheNeedfulsPlayerListener extends PlayerListener {
 		}
 		
 		private boolean isBaseCorrect(Block base) {
-			for (BlockFace blockface : blockfaces) {
+			for (BlockFace blockface : TheNeedfuls.BLOCKFACES) {
 				if (base.getRelative(blockface).getType() != Material.IRON_BLOCK) {
 					return false;
 				}
@@ -196,7 +196,7 @@ public class TheNeedfulsPlayerListener extends PlayerListener {
 		}
 
 		private boolean isSideCorrect(Block side) {
-			for (BlockFace blockface : blockfaces) {
+			for (BlockFace blockface : TheNeedfuls.BLOCKFACES) {
 				Block nextBlock = side.getRelative(blockface);
 				if (blockface == BlockFace.NORTH || blockface == BlockFace.SOUTH || blockface == BlockFace.EAST || blockface == BlockFace.WEST) {
 					if (nextBlock.getType() == Material.AIR && airBlockFace == null) {
