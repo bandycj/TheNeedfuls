@@ -48,6 +48,7 @@ public class Message {
 			+ "%1$s"
 			+ ChatColor.WHITE
 			+ ")");
+	public static Message TORCH_DENY_MESSAGE = new Message("TORCH_DENY_MESSAGE", PREFIX + "A mysterious force prevents you from completing that action!");
 	public static Message ICE_QUANTITY_MESSAGE = new Message("ICE_QUANTITY_MESSAGE", PREFIX
 			+ "Ice stack size dispensed ("
 			+ ChatColor.BLUE
@@ -162,6 +163,7 @@ public class Message {
 		values.put(TORCH_COUNT_MESSAGE.getKey(), TORCH_COUNT_MESSAGE);
 		values.put(TORCH_EXPIRE_MESSAGE.getKey(), TORCH_EXPIRE_MESSAGE);
 		values.put(TORCH_WORLDS_MESSAGE.getKey(), TORCH_WORLDS_MESSAGE);
+		values.put(TORCH_DENY_MESSAGE.getKey(), TORCH_DENY_MESSAGE);
 		values.put(ICE_QUANTITY_MESSAGE.getKey(), ICE_QUANTITY_MESSAGE);
 		values.put(LACK_PERMISSION_MESSAGE.getKey(), LACK_PERMISSION_MESSAGE);
 		values.put(SHOW_EXPERIENCE_MESSAGE.getKey(), SHOW_EXPERIENCE_MESSAGE);

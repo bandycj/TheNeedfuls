@@ -10,7 +10,7 @@ commands:
         description: Get help with TheNeedfuls.
         permission: theneedfuls.help
         usage:  |
-            /<command> [torch|ice|xp|ohnoez|help]
+            /<command> [torch|ice|sheep|xp|ohnoez|help]
     tnt:
         description: Set TheNeedfuls torch options.
         permission: theneedfuls.torch

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.selurgniman.bukkit.theneedfuls.model;
+package org.selurgniman.bukkit.theneedfuls.parts.worlds;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +14,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.selurgniman.bukkit.theneedfuls.model.AbstractCommandModel;
 import org.selurgniman.bukkit.theneedfuls.model.dao.InventoryEnchant;
 import org.selurgniman.bukkit.theneedfuls.model.dao.InventoryItem;
 
@@ -136,6 +137,7 @@ public class WorldsModel extends AbstractCommandModel {
 				.where()
 				.ieq("worldUuid", id)
 				.ieq("player", playerName)
+				.ieq("credit_id", null)
 				.findList();
 		if (inventoryItems == null) {
 			inventoryItems = new ArrayList<InventoryItem>();

@@ -24,58 +24,58 @@ import com.avaje.ebean.validation.NotNull;
 @Table(name = "ohnoez_credits")
 public class Credit {
 	public static final String OHNOEZ_WORLDS_KEY = "ohnoez.worlds";
-	
-    @Id
-    private int id;
-    
-    @Length(max=30)
-    @NotEmpty
-    private String playerName;
-    
-    @NotNull
-    private Integer credits;
+
+	@Id
+	private int id;
+
+	@Length(max = 30)
+	@NotEmpty
+	private String playerName;
+
+	@NotNull
+	private Integer credits;
 
 	private Date lastCredit;
-	
-	@OneToMany(mappedBy="credit",cascade=CascadeType.ALL)
-	private List<Drop> drops;
 
-    public Credit(){
-    	this.drops=new ArrayList<Drop>();
-    }
-    
-    public void setId(int id) {
-        this.id = id;
-    }
+	@OneToMany(mappedBy = "credit", cascade = CascadeType.ALL)
+	private List<InventoryItem> inventoryItems;
 
-    public int getId() {
-        return id;
-    }
+	public Credit() {
+		this.inventoryItems = new ArrayList<InventoryItem>();
+	}
 
-    public String getPlayerName() {
-        return playerName;
-    }
+	public void setId(int id) {
+		this.id = id;
+	}
 
-    public void setPlayerName(String ply) {
-        this.playerName = ply;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public Player getPlayer() {
-        return Bukkit.getServer().getPlayer(playerName);
-    }
+	public String getPlayerName() {
+		return playerName;
+	}
 
-    public void setPlayer(Player player) {
-        this.playerName = player.getName();
-    }
+	public void setPlayerName(String ply) {
+		this.playerName = ply;
+	}
 
-    public Integer getCredits(){
-        return credits;
-    }
+	public Player getPlayer() {
+		return Bukkit.getServer().getPlayer(playerName);
+	}
 
-    public void setCredits(Integer credits){
-        this.credits = credits;
-    }
-    
+	public void setPlayer(Player player) {
+		this.playerName = player.getName();
+	}
+
+	public Integer getCredits() {
+		return credits;
+	}
+
+	public void setCredits(Integer credits) {
+		this.credits = credits;
+	}
+
 	public Date getLastCredit() {
 		return lastCredit;
 	}
@@ -83,12 +83,17 @@ public class Credit {
 	public void setLastCredit(Date lastCredit) {
 		this.lastCredit = lastCredit;
 	}
-	
-	public List<Drop> getDrops() {
-		return drops;
+
+	public List<InventoryItem> getInventoryItems() {
+		return inventoryItems;
 	}
 
-	public void setDrops(List<Drop> drops) {
-		this.drops = drops;
+	public void setInventoryItems(List<InventoryItem> inventoryItems) {
+		this.inventoryItems = inventoryItems;
+	}
+
+	@Override
+	public String toString() {
+		return "id:" + id + " playerName:" + playerName + " credits:" + credits + " lastCredit:" + lastCredit;
 	}
 }

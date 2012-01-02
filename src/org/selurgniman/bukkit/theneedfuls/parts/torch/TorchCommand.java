@@ -1,17 +1,18 @@
 /**
  * 
  */
-package org.selurgniman.bukkit.theneedfuls.commands;
+package org.selurgniman.bukkit.theneedfuls.parts.torch;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
+import org.selurgniman.bukkit.theneedfuls.commands.AbstractCommand;
+import org.selurgniman.bukkit.theneedfuls.commands.ISubCommand;
 import org.selurgniman.bukkit.theneedfuls.helpers.Message;
 import org.selurgniman.bukkit.theneedfuls.model.Model;
 import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
 import org.selurgniman.bukkit.theneedfuls.model.dao.Torch;
-import org.selurgniman.bukkit.theneedfuls.model.TorchModel;
 
 /**
  * @author <a href="mailto:selurgniman@selurgniman.org">Selurgniman</a> Created

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.selurgniman.bukkit.theneedfuls.listeners;
+package org.selurgniman.bukkit.theneedfuls.parts.worlds;
 
 import java.util.Date;
 import java.util.IdentityHashMap;
@@ -24,23 +24,21 @@ import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
-import org.selurgniman.bukkit.theneedfuls.commands.WorldsCommand;
 import org.selurgniman.bukkit.theneedfuls.helpers.Message;
 import org.selurgniman.bukkit.theneedfuls.model.Model;
 import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
-import org.selurgniman.bukkit.theneedfuls.model.WorldsModel;
 
 /**
  * @author <a href="mailto:selurgniman@selurgniman.org">Selurgniman</a> Created
  *         on: Dec 26, 2011
  */
-public class TheNeedfulsPlayerListener extends PlayerListener {
+public class WorldsPlayerListener extends PlayerListener {
 	private final TheNeedfuls plugin;
 	private final WorldsModel worldsModel;
 	private final Pattern signPattern = Pattern.compile("^\\[(.*)\\]$");
 	private final IdentityHashMap<Player, Date> playersTeleported = new IdentityHashMap<Player, Date>();
 
-	public TheNeedfulsPlayerListener(TheNeedfuls plugin) {
+	public WorldsPlayerListener(TheNeedfuls plugin) {
 		this.plugin = plugin;
 		this.worldsModel = (WorldsModel) Model.getCommandModel(CommandType.WORLDS);
 	}
@@ -153,7 +151,6 @@ public class TheNeedfulsPlayerListener extends PlayerListener {
 				if (valid) {
 					nextLevel = nextLevel.getRelative(BlockFace.UP);
 					valid = isSideCorrect(nextLevel);
-					System.out.println("airblockface:" + airBlockFace);
 				} else {
 					break;
 				}

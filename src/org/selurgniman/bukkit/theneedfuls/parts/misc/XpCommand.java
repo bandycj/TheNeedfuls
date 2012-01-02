@@ -1,13 +1,15 @@
 /**
  * 
  */
-package org.selurgniman.bukkit.theneedfuls.commands;
+package org.selurgniman.bukkit.theneedfuls.parts.misc;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
+import org.selurgniman.bukkit.theneedfuls.commands.AbstractCommand;
+import org.selurgniman.bukkit.theneedfuls.commands.ISubCommand;
 import org.selurgniman.bukkit.theneedfuls.helpers.Message;
 
 /**

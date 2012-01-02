@@ -14,35 +14,43 @@ import java.util.logging.Logger;
 import javax.persistence.PersistenceException;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldCreator;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Sheep;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockListener;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.selurgniman.bukkit.theneedfuls.commands.HelpCommand;
-import org.selurgniman.bukkit.theneedfuls.commands.IceCommand;
-import org.selurgniman.bukkit.theneedfuls.commands.OhNoezCommand;
-import org.selurgniman.bukkit.theneedfuls.commands.SheepCommand;
-import org.selurgniman.bukkit.theneedfuls.commands.SortCommand;
-import org.selurgniman.bukkit.theneedfuls.commands.TorchCommand;
-import org.selurgniman.bukkit.theneedfuls.commands.WorldsCommand;
-import org.selurgniman.bukkit.theneedfuls.commands.XpCommand;
 import org.selurgniman.bukkit.theneedfuls.helpers.Message;
-import org.selurgniman.bukkit.theneedfuls.listeners.TheNeedfulsBlockListener;
-import org.selurgniman.bukkit.theneedfuls.listeners.TheNeedfulsEntityListener;
-import org.selurgniman.bukkit.theneedfuls.listeners.TheNeedfulsInventoryListener;
-import org.selurgniman.bukkit.theneedfuls.listeners.TheNeedfulsPlayerListener;
 import org.selurgniman.bukkit.theneedfuls.model.Model;
 import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
-import org.selurgniman.bukkit.theneedfuls.model.TorchModel;
 import org.selurgniman.bukkit.theneedfuls.model.dao.Credit;
 import org.selurgniman.bukkit.theneedfuls.model.dao.Torch;
+import org.selurgniman.bukkit.theneedfuls.parts.ice.IceBlockListener;
+import org.selurgniman.bukkit.theneedfuls.parts.ice.IceCommand;
+import org.selurgniman.bukkit.theneedfuls.parts.misc.SheepCommand;
+import org.selurgniman.bukkit.theneedfuls.parts.misc.SortCommand;
+import org.selurgniman.bukkit.theneedfuls.parts.misc.XpCommand;
+import org.selurgniman.bukkit.theneedfuls.parts.ohnoez.OhNoezCommand;
+import org.selurgniman.bukkit.theneedfuls.parts.ohnoez.OhNoezEntityListener;
+import org.selurgniman.bukkit.theneedfuls.parts.torch.TorchBlockListener;
+import org.selurgniman.bukkit.theneedfuls.parts.torch.TorchCommand;
+import org.selurgniman.bukkit.theneedfuls.parts.torch.TorchEntityListener;
+import org.selurgniman.bukkit.theneedfuls.parts.torch.TorchInventoryListener;
+import org.selurgniman.bukkit.theneedfuls.parts.torch.TorchModel;
+import org.selurgniman.bukkit.theneedfuls.parts.weather.WeatherBlockListener;
+import org.selurgniman.bukkit.theneedfuls.parts.worlds.WorldsCommand;
+import org.selurgniman.bukkit.theneedfuls.parts.worlds.WorldsPlayerListener;
 import org.selurgniman.bukkit.theneedfuls.recipes.GlowstoneRecipe;
 
 import com.avaje.ebean.EbeanServer;
@@ -157,22 +165,56 @@ public class TheNeedfuls extends JavaPlugin {
 
 	private void registerEvents() {
 		PluginManager pm = getServer().getPluginManager();
-		TheNeedfulsEntityListener entityListener = new TheNeedfulsEntityListener(model);
-		TheNeedfulsBlockListener blockListener = new TheNeedfulsBlockListener(this);
-		TheNeedfulsPlayerListener playerListener = new TheNeedfulsPlayerListener(this);
-		TheNeedfulsInventoryListener inventoryListener = new TheNeedfulsInventoryListener(this);
-		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Highest, this);
+		OhNoezEntityListener ohNoezEntityListener = new OhNoezEntityListener(model);
+		pm.registerEvent(Event.Type.ENTITY_DEATH, ohNoezEntityListener, Priority.Highest, this);
+		
+		TorchBlockListener torchBlockListener = new TorchBlockListener(this);
+		TorchEntityListener torchEntityBlockListener = new TorchEntityListener(this);
+		TorchInventoryListener torchInventoryListener = new TorchInventoryListener(this);
+		pm.registerEvent(Event.Type.BLOCK_IGNITE, torchBlockListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.BLOCK_PLACE, torchBlockListener, Priority.Highest, this);
+		pm.registerEvent(Event.Type.BLOCK_BREAK, torchBlockListener, Priority.Highest, this);
+		pm.registerEvent(Event.Type.ENTITY_EXPLODE, torchEntityBlockListener, Priority.Highest, this);
+		pm.registerEvent(Event.Type.CUSTOM_EVENT, torchInventoryListener, Priority.Normal, this);
+		
+		IceBlockListener iceBlockListener = new IceBlockListener(this);
+		pm.registerEvent(Event.Type.BLOCK_DISPENSE, iceBlockListener, Priority.Normal, this);
+
+		BlockListener blockListener = new BlockListener(){
+			@Override
+			public void onBlockBreak(BlockBreakEvent event) {
+				if (!event.isCancelled()) {
+					Block block = event.getBlock();
+					if (block.getType() == Material.GLASS || block.getType() == Material.THIN_GLASS) {
+						Random r = new Random();
+						int glassChance = r.nextInt(3);
+						int sandChance = r.nextInt(2);
+
+						if (glassChance > 0) {
+							block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(block.getType(), 1));
+						} else if (sandChance > 0 && block.getType() == Material.GLASS) {
+							block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.SAND, 1));
+						}
+					} else if (block.getType() == Material.LEAVES){
+						Random r = new Random();
+						int appleChance = r.nextInt(10);
+						if (appleChance>8){
+							block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.APPLE,1));
+						}
+					}
+				}
+			}
+		};
 		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Highest, this);
-		pm.registerEvent(Event.Type.BLOCK_IGNITE, blockListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.BLOCK_DISPENSE, blockListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.BLOCK_PISTON_EXTEND, blockListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.Highest, this);
-		pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.Highest, this);
-		pm.registerEvent(Event.Type.ENTITY_INTERACT, entityListener, Priority.Low, this);
-		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.CUSTOM_EVENT, inventoryListener, Priority.Normal, this);
+		
+		WorldsPlayerListener worldsPlayerListener = new WorldsPlayerListener(this);
+		pm.registerEvent(Event.Type.PLAYER_INTERACT, worldsPlayerListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_PORTAL, worldsPlayerListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_TELEPORT, worldsPlayerListener, Priority.Normal, this);
+		
+		
+		WeatherBlockListener weatherBlockListener = new WeatherBlockListener();
+		pm.registerEvent(Event.Type.BLOCK_PISTON_EXTEND, weatherBlockListener, Priority.Normal, this);
 	}
 
 	private void setCommandExecutors() {

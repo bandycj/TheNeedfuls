@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.selurgniman.bukkit.theneedfuls.commands;
+package org.selurgniman.bukkit.theneedfuls.parts.worlds;
 
 import java.util.UUID;
 
@@ -14,10 +14,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
+import org.selurgniman.bukkit.theneedfuls.commands.AbstractCommand;
+import org.selurgniman.bukkit.theneedfuls.commands.ISubCommand;
 import org.selurgniman.bukkit.theneedfuls.helpers.Message;
 import org.selurgniman.bukkit.theneedfuls.model.Model;
 import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
-import org.selurgniman.bukkit.theneedfuls.model.WorldsModel;
 
 /**
  * @author <a href="mailto:selurgniman@selurgniman.org">Selurgniman</a> Created

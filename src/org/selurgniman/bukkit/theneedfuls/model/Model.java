@@ -15,11 +15,12 @@ import java.util.UUID;
 import org.bukkit.World;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
 import org.selurgniman.bukkit.theneedfuls.model.dao.Credit;
-import org.selurgniman.bukkit.theneedfuls.model.dao.Drop;
-import org.selurgniman.bukkit.theneedfuls.model.dao.Enchant;
 import org.selurgniman.bukkit.theneedfuls.model.dao.InventoryEnchant;
 import org.selurgniman.bukkit.theneedfuls.model.dao.InventoryItem;
 import org.selurgniman.bukkit.theneedfuls.model.dao.Torch;
+import org.selurgniman.bukkit.theneedfuls.parts.ohnoez.OhNoezModel;
+import org.selurgniman.bukkit.theneedfuls.parts.torch.TorchModel;
+import org.selurgniman.bukkit.theneedfuls.parts.worlds.WorldsModel;
 
 import com.avaje.ebean.EbeanServer;
 import com.lennardf1989.bukkitex.MyDatabase;
@@ -95,8 +96,6 @@ public class Model {
 		List<Class<?>> list = new ArrayList<Class<?>>();
 		list.add(Torch.class);
 		list.add(Credit.class);
-		list.add(Drop.class);
-		list.add(Enchant.class);
 		list.add(InventoryItem.class);
 		list.add(InventoryEnchant.class);
 		return list;

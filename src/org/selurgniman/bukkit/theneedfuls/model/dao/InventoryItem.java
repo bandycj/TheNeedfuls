@@ -9,6 +9,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -28,7 +29,7 @@ public class InventoryItem {
 
 	@NotEmpty
 	private String player;
-	
+
 	@NotNull
 	private Integer itemId;
 
@@ -40,25 +41,32 @@ public class InventoryItem {
 
 	@NotNull
 	private Integer itemDurability;
-	
+
 	@NotNull
 	private Integer itemSlot;
 
 	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
 	private List<InventoryEnchant> enchants;
 
+	@ManyToOne(targetEntity = Credit.class, cascade = CascadeType.REFRESH)
+	private Credit credit;
+
 	@NotEmpty
 	private String worldUuid;
 
 	public InventoryItem() {
-		this("",0, 0, 0, 0, -99, new ArrayList<InventoryEnchant>(), "");
+		this(null, "", 0, 0, 0, 0, -99, new ArrayList<InventoryEnchant>(), "");
 	}
 
-	public InventoryItem(String player,int itemId, int itemCount, int itemData, int itemDurability, int itemSlot, String worldUuid) {
-		this(player,itemId, itemCount, itemData, itemDurability, itemSlot, new ArrayList<InventoryEnchant>(), worldUuid);
+	public InventoryItem(Credit credit, int itemId, int itemCount, int itemData, int itemDurability, int itemSlot, String worldUuid) {
+		this(credit, credit.getPlayerName(), itemId, itemCount, itemData, itemDurability, itemSlot, new ArrayList<InventoryEnchant>(), worldUuid);
 	}
 
-	public InventoryItem(String player,int itemId, int itemCount, int itemData, int itemDurability, int itemSlot, List<InventoryEnchant> enchants, String worldUuid) {
+	public InventoryItem(String player, int itemId, int itemCount, int itemData, int itemDurability, int itemSlot, String worldUuid) {
+		this(null, player, itemId, itemCount, itemData, itemDurability, itemSlot, new ArrayList<InventoryEnchant>(), worldUuid);
+	}
+
+	public InventoryItem(Credit credit, String player, int itemId, int itemCount, int itemData, int itemDurability, int itemSlot, List<InventoryEnchant> enchants, String worldUuid) {
 		this.player = player;
 		this.itemId = itemId;
 		this.itemCount = itemCount;
@@ -67,6 +75,7 @@ public class InventoryItem {
 		this.itemSlot = itemSlot;
 		this.enchants = enchants;
 		this.worldUuid = worldUuid;
+		this.credit = credit;
 	}
 
 	/**
@@ -77,7 +86,8 @@ public class InventoryItem {
 	}
 
 	/**
-	 * @param player the player to set
+	 * @param player
+	 *            the player to set
 	 */
 	public void setPlayer(String player) {
 		this.player = player;
@@ -196,10 +206,50 @@ public class InventoryItem {
 	}
 
 	/**
-	 * @param itemSlot the itemSlot to set
+	 * @param itemSlot
+	 *            the itemSlot to set
 	 */
 	public void setItemSlot(Integer itemSlot) {
 		this.itemSlot = itemSlot;
 	}
-	
+
+	/**
+	 * @return the credit
+	 */
+	public Credit getCredit() {
+		return credit;
+	}
+
+	/**
+	 * @param credit
+	 *            the credit to set
+	 */
+	public void setCredit(Credit credit) {
+		this.credit = credit;
+	}
+
+	@Override
+	public String toString() {
+		return "id:"
+				+ id
+				+ " player:"
+				+ player
+				+ " itemId:"
+				+ itemId
+				+ " itemCount:"
+				+ itemCount
+				+ " itemData:"
+				+ itemData
+				+ " itemDurability:"
+				+ itemDurability
+				+ " itemSlot:"
+				+ itemSlot
+				+ " enchants:"
+				+ enchants
+				+ " credit:"
+				+ credit
+				+ " worldUuid+"
+				+ worldUuid;
+	}
+
 }

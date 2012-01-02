@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.selurgniman.bukkit.theneedfuls.model;
+package org.selurgniman.bukkit.theneedfuls.parts.torch;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
+import org.selurgniman.bukkit.theneedfuls.model.AbstractCommandModel;
 import org.selurgniman.bukkit.theneedfuls.model.dao.Torch;
 
 /**

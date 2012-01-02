@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.selurgniman.bukkit.theneedfuls.commands;
+package org.selurgniman.bukkit.theneedfuls.parts.ohnoez;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
@@ -14,13 +14,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
+import org.selurgniman.bukkit.theneedfuls.commands.AbstractCommand;
+import org.selurgniman.bukkit.theneedfuls.commands.ISubCommand;
 import org.selurgniman.bukkit.theneedfuls.helpers.InkSackHelper;
 import org.selurgniman.bukkit.theneedfuls.helpers.Message;
 import org.selurgniman.bukkit.theneedfuls.helpers.PotionHelper;
 import org.selurgniman.bukkit.theneedfuls.model.Model;
 import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
 import org.selurgniman.bukkit.theneedfuls.model.dao.Credit;
-import org.selurgniman.bukkit.theneedfuls.model.OhNoezModel;
 
 /**
  * @author <a href="mailto:selurgniman@selurgniman.org">Selurgniman</a> Created

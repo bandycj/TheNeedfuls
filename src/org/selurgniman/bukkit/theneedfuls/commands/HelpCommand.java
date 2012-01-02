@@ -7,10 +7,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
-import org.selurgniman.bukkit.theneedfuls.commands.IceCommand.IceSubCommand;
-import org.selurgniman.bukkit.theneedfuls.commands.OhNoezCommand.OhNoezSubCommand;
-import org.selurgniman.bukkit.theneedfuls.commands.TorchCommand.TorchSubCommand;
-import org.selurgniman.bukkit.theneedfuls.commands.XpCommand.XpSubCommand;
+import org.selurgniman.bukkit.theneedfuls.parts.ice.IceCommand.IceSubCommand;
+import org.selurgniman.bukkit.theneedfuls.parts.misc.SheepCommand.SheepSubCommand;
+import org.selurgniman.bukkit.theneedfuls.parts.misc.XpCommand.XpSubCommand;
+import org.selurgniman.bukkit.theneedfuls.parts.ohnoez.OhNoezCommand.OhNoezSubCommand;
+import org.selurgniman.bukkit.theneedfuls.parts.torch.TorchCommand.TorchSubCommand;
+import org.selurgniman.bukkit.theneedfuls.parts.worlds.WorldsCommand.WorldsSubCommand;
 
 /**
  * @author <a href="mailto:selurgniman@selurgniman.org">Selurgniman</a> Created
@@ -39,14 +41,23 @@ public class HelpCommand extends AbstractCommand {
 					case TORCH: {
 						sendHelp(sender, TorchSubCommand.valueOf(option));
 					}
-					case XP: {
-						sendHelp(sender, XpSubCommand.valueOf(option));
-					}
 					case ICE: {
 						sendHelp(sender, IceSubCommand.valueOf(option));
 					}
+					case SHEEP: {
+						sendHelp(sender, SheepSubCommand.valueOf(option));
+					}
+					case XP: {
+						sendHelp(sender, XpSubCommand.valueOf(option));
+					}
+					case WORLDS: {
+						sendHelp(sender, WorldsSubCommand.valueOf(option));
+					}
 					case OHNOEZ: {
 						sendHelp(sender, OhNoezSubCommand.valueOf(option));
+					}
+					case SORT: {
+						sender.sendMessage("This command has no parameters.");
 					}
 					case HELP: {
 						sendHelp(sender, HelpSubCommand.valueOf(option));
@@ -74,12 +85,21 @@ public class HelpCommand extends AbstractCommand {
 		ICE(
 				ChatColor.GREEN + "Help Ice: " + ChatColor.WHITE + "displays detailed help for the tni command.",
 				"/tnh ice"),
+		SHEEP(
+				ChatColor.GREEN + "Help Cheep: " + ChatColor.WHITE + "displays detailed help for the tns command.",
+				"/tnh sheep"),
 		XP(
 				ChatColor.GREEN + "Help XP: " + ChatColor.WHITE + "displays detailed help for the tnx command.",
 				"/tnh xp"),
+		WORLDS(
+				ChatColor.GREEN + "Help Worlds: " + ChatColor.WHITE + "displays detailed help for the tnw command.",
+				"/tnh worlds"),
 		OHNOEZ(
 				ChatColor.GREEN + "Help OhNoez: " + ChatColor.WHITE + "displays detailed help for the ohnoez command.",
 				"/tnh ohnoez"),
+		SORT(
+				ChatColor.GREEN + "Help Sort: " + ChatColor.WHITE + "displays detailed help for the sort command.",
+				"/tnh sort"),
 		HELP(
 				ChatColor.GREEN + "Help Help: " + ChatColor.WHITE + "displays detailed help for the help command.",
 				"/tnh help");

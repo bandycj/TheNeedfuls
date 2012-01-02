@@ -6,7 +6,6 @@ package org.selurgniman.bukkit.theneedfuls.model.dao;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -23,8 +22,7 @@ public class InventoryEnchant {
 	@Id
 	private Integer id;
 
-	@ManyToOne(cascade = CascadeType.REFRESH)
-	@JoinColumn(name = "enchants")
+	@ManyToOne(targetEntity = InventoryItem.class, cascade = CascadeType.REFRESH)
 	private InventoryItem item;
 
 	@NotNull
@@ -103,4 +101,8 @@ public class InventoryEnchant {
 		this.enchantLevel = enchantLevel;
 	}
 
+	@Override
+	public String toString() {
+		return "id:" + id + " enchantId:" + enchantId + " enchantLevel:" + enchantLevel;
+	}
 }

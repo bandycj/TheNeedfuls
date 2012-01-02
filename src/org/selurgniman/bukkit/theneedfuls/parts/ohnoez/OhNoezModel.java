@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.selurgniman.bukkit.theneedfuls.model;
+package org.selurgniman.bukkit.theneedfuls.parts.ohnoez;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -18,13 +18,14 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.selurgniman.bukkit.theneedfuls.helpers.Message;
+import org.selurgniman.bukkit.theneedfuls.model.AbstractCommandModel;
 import org.selurgniman.bukkit.theneedfuls.model.dao.Credit;
-import org.selurgniman.bukkit.theneedfuls.model.dao.Drop;
-import org.selurgniman.bukkit.theneedfuls.model.dao.Enchant;
+import org.selurgniman.bukkit.theneedfuls.model.dao.InventoryEnchant;
+import org.selurgniman.bukkit.theneedfuls.model.dao.InventoryItem;
 
 /**
  * @author <a href="mailto:e83800@wnco.com">Chris Bandy</a> Created on: Dec 27,
@@ -33,21 +34,23 @@ import org.selurgniman.bukkit.theneedfuls.model.dao.Enchant;
 public class OhNoezModel extends AbstractCommandModel {
 
 	public void useAvailableCredit(Player player) {
-		if (getPlugin() == null) return;
-		
+		if (getPlugin() == null)
+			return;
+
 		Credit creditClass = getRecordForPlayer(player);
 		if (getAvailableCredits(player) > 0) {
 			creditClass.setCredits(creditClass.getCredits() - 1);
 			creditClass.setLastCredit(new Date());
-			getPlugin().getDatabase().delete(creditClass.getDrops());
+			getPlugin().getDatabase().delete(creditClass.getInventoryItems());
 			getPlugin().getDatabase().save(creditClass);
 			player.getServer().broadcastMessage(String.format(Message.CREDIT_USED_MESSAGE.toString(), player.getName()));
 		}
 	}
 
 	public int getAvailableCredits(Player player) {
-		if (getPlugin() == null) return -1;
-		
+		if (getPlugin() == null)
+			return -1;
+
 		Credit creditClass = getRecordForPlayer(player);
 		if (creditClass.getCredits() == 0) {
 			Date lastCreditDate = creditClass.getLastCredit();
@@ -64,7 +67,7 @@ public class OhNoezModel extends AbstractCommandModel {
 	public SimpleEntry<Integer, Float> getLastExperience(Player player) {
 		SimpleEntry<Integer, Float> entry = null;
 		Credit creditClass = getRecordForPlayer(player);
-		for (Drop drop : creditClass.getDrops()) {
+		for (InventoryItem drop : creditClass.getInventoryItems()) {
 			if (drop.getItemId() == -2) {
 				player.sendMessage("level: " + drop.getItemCount() + " next: " + drop.getItemDurability());
 				entry = new SimpleEntry<Integer, Float>(drop.getItemCount(), drop.getItemDurability().floatValue() / 100);
@@ -79,16 +82,16 @@ public class OhNoezModel extends AbstractCommandModel {
 	public List<ItemStack> getLastInventory(Player player) {
 		Credit creditClass = getRecordForPlayer(player);
 		ArrayList<ItemStack> items = new ArrayList<ItemStack>();
-		for (Drop drop : creditClass.getDrops()) {
+		for (InventoryItem drop : creditClass.getInventoryItems()) {
 			if (drop.getItemId() != -2 && player.getWorld().getUID().equals(UUID.fromString(drop.getWorldUuid()))) {
 				Material material = Material.getMaterial(drop.getItemId());
 				int itemCount = drop.getItemCount();
 				short itemDurability = drop.getItemDurability().shortValue();
 				byte itemData = drop.getItemData().byteValue();
-				List<Enchant> enchants = drop.getEnchants();
+				List<InventoryEnchant> enchants = drop.getEnchants();
 
 				ItemStack item = new ItemStack(material, itemCount, itemDurability, itemData);
-				for (Enchant enchant : enchants) {
+				for (InventoryEnchant enchant : enchants) {
 					Enchantment enchantment = Enchantment.getById(enchant.getEnchantId());
 					item.addEnchantment(enchantment, enchant.getEnchantLevel());
 				}
@@ -103,8 +106,9 @@ public class OhNoezModel extends AbstractCommandModel {
 	}
 
 	public void setAvailableCredits(Player player, int count) {
-		if (getPlugin() == null) return;
-		
+		if (getPlugin() == null)
+			return;
+
 		Credit creditClass = getRecordForPlayer(player);
 		creditClass.setCredits(count);
 
@@ -112,11 +116,13 @@ public class OhNoezModel extends AbstractCommandModel {
 	}
 
 	public void setLastInventory(PlayerDeathEvent event) {
-		if (getPlugin() == null) return;
-		
+		try{
+		if (getPlugin() == null)
+			return;
+
 		Player player = (Player) event.getEntity();
 		Credit creditClass = getRecordForPlayer(player);
-		ArrayList<Drop> drops = new ArrayList<Drop>();
+		ArrayList<InventoryItem> drops = new ArrayList<InventoryItem>();
 		int itemId = -2;
 		int itemCount = player.getLevel();
 		int itemData = 0;
@@ -127,32 +133,38 @@ public class OhNoezModel extends AbstractCommandModel {
 			itemDurability = 0;
 		}
 		String worldId = player.getWorld().getUID().toString();
-		drops.add(new Drop(creditClass, itemId, itemCount, itemData, itemDurability, worldId));
-
+		drops.add(new InventoryItem(creditClass, itemId, itemCount, itemData, itemDurability, -99, worldId));
+		
+		int counter = 0;
 		for (ItemStack item : event.getDrops()) {
 			itemId = item.getTypeId();
 			itemCount = item.getAmount();
 			itemData = item.getData().getData();
 			itemDurability = item.getDurability();
-			Drop drop = new Drop(creditClass, itemId, itemCount, itemData, itemDurability, worldId);
+			InventoryItem drop = new InventoryItem(creditClass, itemId, itemCount, itemData, itemDurability, counter, worldId);
 
-			ArrayList<Enchant> enchants = new ArrayList<Enchant>();
+			ArrayList<InventoryEnchant> enchants = new ArrayList<InventoryEnchant>();
 			for (Entry<Enchantment, Integer> entry : item.getEnchantments().entrySet()) {
 				int id = entry.getKey().getId();
 				int level = entry.getValue();
-				enchants.add(new Enchant(id, level, drop));
+				enchants.add(new InventoryEnchant(id, level, drop));
 			}
 			drop.setEnchants(enchants);
 
 			drops.add(drop);
+			counter++;
 		}
-
+		
 		getPlugin().getDatabase().save(drops);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 
 	private Credit getRecordForPlayer(Player player) {
-		if (getPlugin() == null) return null;
-		
+		if (getPlugin() == null)
+			return null;
+
 		String name = player.getName();
 		Credit creditClass = getPlugin().getDatabase().find(Credit.class).where().ieq("player_name", name).findUnique();
 		if (creditClass == null) {
@@ -165,7 +177,7 @@ public class OhNoezModel extends AbstractCommandModel {
 
 		return creditClass;
 	}
-	
+
 	public String getPlayerDamageCause(EntityDamageEvent event) {
 		// ****************************************************************
 		Player player = (Player) event.getEntity();

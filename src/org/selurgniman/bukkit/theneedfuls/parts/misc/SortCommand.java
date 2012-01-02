@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.selurgniman.bukkit.theneedfuls.commands;
+package org.selurgniman.bukkit.theneedfuls.parts.misc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -180,7 +180,6 @@ public class SortCommand implements CommandExecutor {
 				});
 
 				for (Inventory inventory : inventories) {
-					System.out.println("size:"+itemStacks.length+hotbar.length);
 					if (inventory instanceof PlayerInventory && itemStacks.length+hotbar.length == 36) {
 						itemStacks = concat(hotbar, itemStacks);
 						inventory.setContents(itemStacks);
