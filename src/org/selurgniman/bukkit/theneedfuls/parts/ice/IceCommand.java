@@ -36,18 +36,17 @@ public class IceCommand extends AbstractCommand {
 	 * , org.bukkit.command.Command, java.lang.String, java.lang.String[])
 	 */
 	@Override
-	public boolean processCommand(CommandSender sender, Command command, String label, String[] args, ISubCommand operation, String option) {
-		if (operation instanceof IceSubCommand) {
+	public boolean processCommand(CommandSender sender, Command command, String label, String[] args, ISubCommand operation) {
+		if (operation != null && operation instanceof IceSubCommand) {
 			switch ((IceSubCommand) operation) {
 				case QUANTITY: {
 					try {
-						plugin.getConfig().set("iceMaker.quantity", Integer.parseInt(option));
+						plugin.getConfig().set("iceMaker.quantity", Integer.parseInt(args[1]));
 						plugin.saveConfig();
-					} catch (NumberFormatException ex) {
-
+					} catch (NumberFormatException | ArrayIndexOutOfBoundsException ex) {
 					}
 
-					sender.sendMessage(String.format(Message.ICE_QUANTITY_MESSAGE.toString(), plugin.getConfig().get("iceMaker.quantity")));
+					sender.sendMessage(Message.ICE_QUANTITY_MESSAGE.with(plugin.getConfig().getInt("iceMaker.quantity")));
 					return true;
 				}
 			}

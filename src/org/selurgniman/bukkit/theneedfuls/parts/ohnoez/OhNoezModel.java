@@ -43,7 +43,7 @@ public class OhNoezModel extends AbstractCommandModel {
 			creditClass.setLastCredit(new Date());
 			getPlugin().getDatabase().delete(creditClass.getInventoryItems());
 			getPlugin().getDatabase().save(creditClass);
-			player.getServer().broadcastMessage(String.format(Message.CREDIT_USED_MESSAGE.toString(), player.getName()));
+			player.getServer().broadcastMessage(Message.CREDIT_USED_MESSAGE.with(player.getName()));
 		}
 	}
 

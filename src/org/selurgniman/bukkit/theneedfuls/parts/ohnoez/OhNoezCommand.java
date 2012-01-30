@@ -29,13 +29,14 @@ import org.selurgniman.bukkit.theneedfuls.model.dao.Credit;
  */
 public class OhNoezCommand extends AbstractCommand {
 	private final OhNoezModel model;
+
 	/**
 	 * @param name
 	 * @param plugin
 	 */
 	public OhNoezCommand(TheNeedfuls plugin) {
 		super(plugin);
-		this.model = (OhNoezModel)Model.getCommandModel(CommandType.OHNOEZ);
+		this.model = (OhNoezModel) Model.getCommandModel(CommandType.OHNOEZ);
 		this.setSubCommands(OhNoezSubCommand.values());
 	}
 
@@ -47,11 +48,15 @@ public class OhNoezCommand extends AbstractCommand {
 	 * , org.bukkit.command.Command, java.lang.String, java.lang.String[])
 	 */
 	@Override
-	public boolean processCommand(CommandSender sender, Command command, String label, String[] args, ISubCommand operation, String option) {
-		if (operation instanceof OhNoezSubCommand) {
+	public boolean processCommand(CommandSender sender, Command command, String label, String[] args, ISubCommand operation) {
+		if (operation != null && operation instanceof OhNoezSubCommand) {
 			switch ((OhNoezSubCommand) operation) {
 				case LIST: {
-					Player player = sender.getServer().getPlayer(option);
+					Player player = null;
+					try {
+						player = sender.getServer().getPlayer(args[1]);
+					} catch (ArrayIndexOutOfBoundsException ex) {
+					}
 					if (sender instanceof Player || player != null) {
 						if (player == null) {
 							player = (Player) sender;
@@ -69,45 +74,62 @@ public class OhNoezCommand extends AbstractCommand {
 										}
 									}
 								}
-								sender.sendMessage(String.format(Message.LIST_ITEM_MESSAGE + "\n", itemTypeName, itemStack.getAmount()));
+								sender.sendMessage(Message.LIST_ITEM_MESSAGE.with(itemTypeName, itemStack.getAmount()));
 							}
 							SimpleEntry<Integer, Float> lastExp = model.getLastExperience(player);
-							sender.sendMessage(String.format(Message.LIST_ITEM_MESSAGE.toString(), "Experience levels", lastExp.getKey()));
+							sender.sendMessage(Message.LIST_ITEM_MESSAGE.with("Experience levels", lastExp.getKey()));
 						} else {
 							sender.sendMessage(Message.NO_ITEMS_MESSAGE.toString());
 						}
 						return true;
 					}
 
-					return false;
+					break;
 				}
 				case CREDITS: {
-					if (option.isEmpty() && sender instanceof Player) {
-						Player player = (Player) sender;
-						sender.sendMessage(String.format(
-								Message.AVAILABLE_CREDITS_MESSAGE.toString(),
-								player.getName(),
-								model.getAvailableCredits(player)));
-						return true;
-					} else if (args.length > 3) {
-						Player player = getPlugin().getServer().getPlayer(args[2]);
-						int amount = Integer.parseInt(args[3]);
-						if (option.equalsIgnoreCase("ADD")) {
-							model.addAvailableCredits(player, amount);
-						} else if (option.equalsIgnoreCase("SET")) {
-							model.setAvailableCredits(player, amount);
+					Player player = null;
+					try {
+						player = sender.getServer().getPlayer(args[1]);
+					} catch (ArrayIndexOutOfBoundsException ex) {
+					}
+					if (sender instanceof Player || player != null) {
+						if (player == null) {
+							player = (Player) sender;
 						}
-						sender.sendMessage(String.format(
-								Message.AVAILABLE_CREDITS_MESSAGE.toString(),
-								player.getName(),
-								model.getAvailableCredits(player)));
+						sender.sendMessage(Message.AVAILABLE_CREDITS_MESSAGE.with(player.getName(), model.getAvailableCredits(player)));
 						return true;
 					}
 
-					return false;
+					break;
+				}
+				case ADDCREDITS: {
+					try {
+						Player player = getPlugin().getServer().getPlayer(args[1]);
+						int amount = Integer.parseInt(args[2]);
+						model.addAvailableCredits(player, amount);
+						sender.sendMessage(Message.AVAILABLE_CREDITS_MESSAGE.with(player.getName(), model.getAvailableCredits(player)));
+
+						return true;
+					} catch (NumberFormatException | ArrayIndexOutOfBoundsException ex) {
+					}
+
+					break;
+				}
+				case SETCREDITS: {
+					try {
+						Player player = getPlugin().getServer().getPlayer(args[1]);
+						int amount = Integer.parseInt(args[2]);
+						model.setAvailableCredits(player, amount);
+						sender.sendMessage(Message.AVAILABLE_CREDITS_MESSAGE.with(player.getName(), model.getAvailableCredits(player)));
+
+						return true;
+					} catch (NumberFormatException | ArrayIndexOutOfBoundsException ex) {
+					}
+
+					break;
 				}
 				case CLAIM: {
-					if (sender instanceof Player && this.getPlugin().getModel().isCommandWorld(CommandType.OHNOEZ,((Player) sender).getWorld())) {
+					if (sender instanceof Player && this.getPlugin().getModel().isCommandWorld(CommandType.OHNOEZ, ((Player) sender).getWorld())) {
 						Player player = (Player) sender;
 						List<ItemStack> droppedItems = model.getLastInventory(player);
 						Entry<Integer, Float> droppedExp = model.getLastExperience(player);
@@ -116,17 +138,14 @@ public class OhNoezCommand extends AbstractCommand {
 							if (model.getAvailableCredits(player) > 0) {
 								for (ItemStack itemStack : droppedItems) {
 									player.getInventory().addItem(itemStack);
-									sender.sendMessage(String.format(
-											Message.CREDITED_BACK_MESSAGE.toString(),
-											itemStack.getType().toString(),
-											itemStack.getAmount()));
+									sender.sendMessage(Message.CREDITED_BACK_MESSAGE.with(itemStack.getType().toString(), itemStack.getAmount()));
 								}
 								player.setLevel(player.getLevel() + droppedExp.getKey());
 								player.setExp(player.getExp() + droppedExp.getValue());
 
 								model.useAvailableCredit(player);
 							} else {
-								sender.sendMessage(String.format(Message.AVAILABLE_CREDITS_MESSAGE.toString(), player.getName(), model.getAvailableCredits(player)));
+								sender.sendMessage(Message.AVAILABLE_CREDITS_MESSAGE.with(player.getName(), model.getAvailableCredits(player)));
 							}
 						} else {
 							sender.sendMessage(Message.NO_ITEMS_MESSAGE.toString());
@@ -134,19 +153,16 @@ public class OhNoezCommand extends AbstractCommand {
 						return true;
 					}
 
-					return false;
+					break;
 				}
 				case WORLDS: {
-					if (args.length > 2) {
-						addRemoveWorld(option, args[2], Credit.OHNOEZ_WORLDS_KEY);
+					try {
+						addRemoveWorld(args[1], args[2], Credit.OHNOEZ_WORLDS_KEY);
+					} catch (ArrayIndexOutOfBoundsException ex) {
 					}
-					
-					sender.sendMessage(String.format(Message.OHNOEZ_WORLDS_MESSAGE.toString(), getWorldsList(Credit.OHNOEZ_WORLDS_KEY)));
-					return true;
-				}
 
-				default: {
-					return false;
+					sender.sendMessage(Message.OHNOEZ_WORLDS_MESSAGE.with(getWorldsList(Credit.OHNOEZ_WORLDS_KEY)));
+					return true;
 				}
 			}
 		}
@@ -160,8 +176,14 @@ public class OhNoezCommand extends AbstractCommand {
 				ChatColor.GREEN + "OhNoez List: " + ChatColor.WHITE + "shows the list of the items dropped during the last death.",
 				"/ohnoez list"),
 		CREDITS(
-				ChatColor.GREEN + "OhNoez Credits: " + ChatColor.WHITE + "displays, adds and sets the credits of a player.",
-				"/ohnoez credits [<add|set> <player> <amount>]"),
+				ChatColor.GREEN + "OhNoez Credits: " + ChatColor.WHITE + "displays the credits of a player.",
+				"/ohnoez credits <player>"),
+		ADDCREDITS(
+				ChatColor.GREEN + "OhNoez AddCredits: " + ChatColor.WHITE + "adds credits to a player.",
+				"/ohnoez addcredits <player> <amount>"),
+		SETCREDITS(
+				ChatColor.GREEN + "OhNoez SetCredits: " + ChatColor.WHITE + "sets the credits of a player.",
+				"/ohnoez setcredits <player> <amount>"),
 		CLAIM(
 				ChatColor.GREEN + "OhNoez Claim: " + ChatColor.WHITE + "uses a credit if one is available.",
 				"/ohnoez claim"),

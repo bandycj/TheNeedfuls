@@ -31,6 +31,7 @@ public class TorchModel extends AbstractCommandModel {
 	}
 
 	public void addTorch(Block torch) {
+		System.out.println(torch);
 		if (getRecordForTorch(torch) == null) {
 			createTorch(torch);
 		}

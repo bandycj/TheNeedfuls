@@ -28,13 +28,15 @@ public class WorldsCommand extends AbstractCommand {
 	public final static String CONFIG_TELEPORT_DELAY = "worlds.teleportDelaySeconds";
 
 	public final WorldsModel model;
+
 	/**
 	 * @param name
-	 * @param getPlugin()
+	 * @param getPlugin
+	 *            ()
 	 */
 	public WorldsCommand(TheNeedfuls plugin) {
 		super(plugin);
-		this.model = (WorldsModel)Model.getCommandModel(CommandType.WORLDS);
+		this.model = (WorldsModel) Model.getCommandModel(CommandType.WORLDS);
 		this.setSubCommands(WorldsSubCommand.values());
 	}
 
@@ -46,62 +48,62 @@ public class WorldsCommand extends AbstractCommand {
 	 * , org.bukkit.command.Command, java.lang.String, java.lang.String[])
 	 */
 	@Override
-	public boolean processCommand(CommandSender sender, Command command, String label, String[] args, ISubCommand operation, String option) {
-		if (operation instanceof WorldsSubCommand) {
+	public boolean processCommand(CommandSender sender, Command command, String label, String[] args, ISubCommand operation) {
+		if (operation != null && operation instanceof WorldsSubCommand) {
 			switch ((WorldsSubCommand) operation) {
 				case CREATE: {
-					if (!option.isEmpty()) {
-						WorldCreator creator = new WorldCreator(option);
+					try {
+						WorldCreator creator = new WorldCreator(args[1]);
 						getPlugin().getServer().createWorld(creator);
 
-						sender.sendMessage(String.format(Message.WORLD_CREATED_MESSAGE.toString(), option));
+						sender.sendMessage(Message.WORLD_CREATED_MESSAGE.with(args[1]));
 						return true;
+					} catch (ArrayIndexOutOfBoundsException ex) {
 					}
-
 					break;
 				}
 				case DELETE: {
 					Server server = getPlugin().getServer();
 					try {
-						World world = server.getWorld(UUID.fromString(option));
+						World world = server.getWorld(UUID.fromString(args[1]));
 						String name = world.getName();
 						server.unloadWorld(world, false);
-						server.getWorld(option).getWorldFolder().delete();
+						server.getWorld(args[1]).getWorldFolder().delete();
 
-						sender.sendMessage(String.format(Message.WORLD_DELETED_MESSAGE.toString(), name));
+						sender.sendMessage(Message.WORLD_DELETED_MESSAGE.with(name));
 
 						return true;
-					} catch (IllegalArgumentException ex) {
-						sender.sendMessage(ex.getMessage());
+					} catch (NumberFormatException | ArrayIndexOutOfBoundsException ex) {
 					}
 
 					break;
 				}
 				case LIST: {
-					sender.sendMessage(String.format(Message.WORLD_LIST_MESSAGE.toString(), getWorldsList(getPlugin().getServer().getWorlds())));
+					sender.sendMessage(Message.WORLD_LIST_MESSAGE.with(getWorldsList(getPlugin().getServer().getWorlds())));
 
 					return true;
 				}
 				case PORT: {
-					if (sender instanceof Player && !option.isEmpty()) {
-						World world = getPlugin().getServer().getWorld(option);
-						Player player = (Player) sender;
-						player.teleport(world.getSpawnLocation(), TeleportCause.COMMAND);
+					try {
+						if (sender instanceof Player && !args[1].isEmpty()) {
+							World world = getPlugin().getServer().getWorld(args[1]);
+							Player player = (Player) sender;
+							player.teleport(world.getSpawnLocation(), TeleportCause.COMMAND);
 
-						return true;
+							return true;
+						}
+					} catch (ArrayIndexOutOfBoundsException ex) {
 					}
-
 					break;
 				}
 				case DELAY: {
 					try {
-						getPlugin().getConfig().set(WorldsCommand.CONFIG_TELEPORT_DELAY, Integer.parseInt(option));
+						getPlugin().getConfig().set(WorldsCommand.CONFIG_TELEPORT_DELAY, Integer.parseInt(args[1]));
 						getPlugin().saveConfig();
-					} catch (NumberFormatException ex) {
-
+					} catch (NumberFormatException | ArrayIndexOutOfBoundsException ex) {
 					}
 
-					sender.sendMessage(String.format(Message.WORLD_DELAY_MESSAGE.toString(), getPlugin().getConfig().get(WorldsCommand.CONFIG_TELEPORT_DELAY)));
+					sender.sendMessage(Message.WORLD_DELAY_MESSAGE.with(getPlugin().getConfig().get(WorldsCommand.CONFIG_TELEPORT_DELAY)));
 
 					return true;
 				}

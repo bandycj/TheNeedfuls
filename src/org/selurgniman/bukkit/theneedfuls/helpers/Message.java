@@ -3,14 +3,12 @@
  */
 package org.selurgniman.bukkit.theneedfuls.helpers;
 
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.Configuration;
-
-import com.google.common.collect.Maps;
 
 /**
  * @author <a href="mailto:selurgniman@selurgniman.org">Selurgniman</a> Created
@@ -18,6 +16,19 @@ import com.google.common.collect.Maps;
  */
 public class Message {
 	public static Message PREFIX = new Message("PREFIX", ChatColor.BLUE + "TheNeedfuls: " + ChatColor.WHITE);
+	public static Message ENCHANT_REPAIR_MESSAGE = new Message("ENCHANT_REPAIR_MESSAGE", PREFIX
+			+ "You need to equip your "
+			+ ChatColor.GREEN
+			+ "%1$s"
+			+ ChatColor.WHITE
+			+ " before repairing another enchanted item!");
+	public static Message AFK_SET_MESSAGE = new Message("AFK_SET_MESSAGE", PREFIX + "AFK status set to: (%1$s" + ChatColor.WHITE + ")");
+	public static Message AFK_DELAY_MESSAGE = new Message("AFK_DELAY_MESSAGE", PREFIX
+			+ "AFK delay set to ("
+			+ ChatColor.GREEN
+			+ "%1$d seconds"
+			+ ChatColor.WHITE
+			+ ")");
 	public static Message TORCH_AGE_MESSAGE = new Message("TORCH_AGE_MESSAGE", PREFIX
 			+ "Torch expiration set to ("
 			+ ChatColor.GREEN
@@ -58,7 +69,7 @@ public class Message {
 	public static Message LACK_PERMISSION_MESSAGE = new Message("LACK_PERMISSION_MESSAGE", PREFIX
 			+ "You are not an op or lack permission ("
 			+ ChatColor.GREEN
-			+ "%1$s.%2$s"
+			+ "%1$s"
 			+ ChatColor.WHITE
 			+ ")");
 	public static Message SHOW_EXPERIENCE_MESSAGE = new Message("SHOW_EXPERIENCE_MESSAGE", PREFIX
@@ -155,9 +166,12 @@ public class Message {
 			+ ")");
 
 	private static Configuration config = null;
-	private static Map<String, Message> values = Maps.newConcurrentMap();
+	private static ConcurrentSkipListMap<String, Message> values = new ConcurrentSkipListMap<String, Message>();
 	static {
 		values.put(PREFIX.getKey(), PREFIX);
+		values.put(ENCHANT_REPAIR_MESSAGE.getKey(), ENCHANT_REPAIR_MESSAGE);
+		values.put(AFK_DELAY_MESSAGE.getKey(), AFK_DELAY_MESSAGE);
+		values.put(AFK_SET_MESSAGE.getKey(), AFK_SET_MESSAGE);
 		values.put(TORCH_AGE_MESSAGE.getKey(), TORCH_AGE_MESSAGE);
 		values.put(TORCH_REFRESH_MESSAGE.getKey(), TORCH_REFRESH_MESSAGE);
 		values.put(TORCH_COUNT_MESSAGE.getKey(), TORCH_COUNT_MESSAGE);
@@ -218,6 +232,26 @@ public class Message {
 
 	public static Set<Entry<String, Message>> values() {
 		return values.entrySet();
+	}
+
+	public String with(Object... values) {
+		switch (values.length) {
+			case 0: {
+				return this.message;
+			}
+			case 1: {
+				return String.format(this.message, values[0]);
+			}
+			case 2: {
+				return String.format(this.message, values[0], values[1]);
+			}
+			case 3: {
+				return String.format(this.message, values[0], values[1], values[2]);
+			}
+			default: {
+				return "Unknown message format";
+			}
+		}
 	}
 
 	@Override

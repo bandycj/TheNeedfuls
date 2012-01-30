@@ -18,7 +18,8 @@ import org.selurgniman.bukkit.theneedfuls.helpers.Message;
  */
 public class XpCommand extends AbstractCommand {
 	/**
-	 * @param getPlugin()
+	 * @param getPlugin
+	 *            ()
 	 */
 	public XpCommand(TheNeedfuls plugin) {
 		super(plugin);
@@ -33,27 +34,26 @@ public class XpCommand extends AbstractCommand {
 	 * , org.bukkit.command.Command, java.lang.String, java.lang.String[])
 	 */
 	@Override
-	public boolean processCommand(CommandSender sender, Command command, String label, String[] args, ISubCommand operation, String option) {
-		if (operation instanceof XpSubCommand) {
+	public boolean processCommand(CommandSender sender, Command command, String label, String[] args, ISubCommand operation) {
+		if (operation != null && operation instanceof XpSubCommand) {
 			Integer amount = 0;
 			if (args.length > 2) {
 				try {
 					amount = Integer.parseInt(args[2]);
-				} catch (NumberFormatException ex) {
-					ex.printStackTrace();
+				} catch (NumberFormatException | ArrayIndexOutOfBoundsException ex) {
 					return false;
 				}
 			}
 
-			Player player = getPlugin().getServer().getPlayer(option);
+			Player player = getPlugin().getServer().getPlayer(args[1]);
 			if (player == null) {
-				sender.sendMessage(ChatColor.RED + "Player not found: " + ChatColor.WHITE + option);
+				sender.sendMessage(ChatColor.RED + "Player not found: " + ChatColor.WHITE + args[1]);
 				return true;
 			}
 
 			switch ((XpSubCommand) operation) {
 				case SHOW: {
-					sender.sendMessage(String.format(Message.SHOW_EXPERIENCE_MESSAGE.toString(), player.getDisplayName(), player.getLevel()));
+					sender.sendMessage(Message.SHOW_EXPERIENCE_MESSAGE.with(player.getDisplayName(), player.getLevel()));
 					break;
 				}
 				case GIVE: {
@@ -62,7 +62,7 @@ public class XpCommand extends AbstractCommand {
 							player.setLevel(player.getLevel() + amount);
 							((Player) sender).setLevel(((Player) sender).getLevel() - amount);
 						} else {
-							sender.sendMessage(String.format(Message.INSUFFICIENT_EXPERIENCE_MESSAGE.toString(),amount));
+							sender.sendMessage(Message.INSUFFICIENT_EXPERIENCE_MESSAGE.with(amount));
 						}
 					}
 					break;
@@ -80,7 +80,7 @@ public class XpCommand extends AbstractCommand {
 					break;
 				}
 			}
-			sender.sendMessage(String.format(Message.SHOW_EXPERIENCE_MESSAGE.toString(), player.getDisplayName(), player.getLevel()));
+			sender.sendMessage(Message.SHOW_EXPERIENCE_MESSAGE.with(player.getDisplayName(), player.getLevel()));
 
 			return true;
 		}

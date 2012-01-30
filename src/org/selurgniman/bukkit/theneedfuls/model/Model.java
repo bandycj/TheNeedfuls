@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.World;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
 import org.selurgniman.bukkit.theneedfuls.model.dao.Credit;
 import org.selurgniman.bukkit.theneedfuls.model.dao.InventoryEnchant;
@@ -132,5 +133,9 @@ public class Model {
 		public AbstractCommandModel getModel(){
 			return this.commandModel;
 		}
+	}
+	
+	public FileConfiguration getConfig(){
+		return plugin.getConfig();
 	}
 }

@@ -1,235 +1,220 @@
 name: TheNeedfuls
-version: 0.5
+version: 0.6
 author: Selurgniman
 main: org.selurgniman.bukkit.theneedfuls.TheNeedfuls
 
 database: false
 
 commands:
-    tnh:
-        description: Get help with TheNeedfuls.
-        permission: theneedfuls.help
-        usage:  |
-            /<command> [torch|ice|sheep|xp|ohnoez|help]
-    tnt:
-        description: Set TheNeedfuls torch options.
-        permission: theneedfuls.torch
-        usage:  |
-            /<command> [age|refresh|count|expire|worlds] [options]
-            Example: /<command> age 300 - set the maximum torch age to 300 seconds.
-            Example: /<command> refresh 30 - set the torch expiration check to every 30 seconds.
-            Example: /<command> count - see how many torches are being tracked.
-            Example: /<command> expire - expire all torches being tracked.
-            Example: /<command> worlds - see a list of worlds that torch expiration is enabled on.
-            Example: /<command> worlds add world - enable torch expiration on world named "world".
-            Example: /<command> worlds remove world - disable torch expiration on world named "world".
-    tni:
-        description: Set TheNeedfuls ice options.
-        permission: theneedfuls.ice
-        usage:  |
-            /<command> [quantity] [1-64]
-            Example: /<command> quantity 32 - set the stack size of the dispensed ice to 32.
-    tns:
-        description: Set TheNeedfuls sheep options.
-        permission: theneedfuls.sheep
-        usage:  |
-            /<command> refresh [time in seconds]
-            Example: /<command> refresh - display the current refresh rate.
-            Example: /<command> refresh 30 - set the refresh rate to 30 seconds.
-    tnx:
-        description: Set TheNeedfuls experience options.
-        permission: theneedfuls.xp
-        usage:  |
-            /<command> [show|give|take|set] [level integer]
-            Example: /<command> show <player> - Show the player's level.
-            Example: /<command> give <player> 5 - add 5 levels to the player.
-            Example: /<command> take <player> 5 - remove 5 levels from the player.
-            Example: /<command> set <player> 5 - set the player's level to 5.
-    tnw:
-        description: Set TheNeedfuls worlds options.
-        permission: theneedfuls.worlds
-        usage:  |
-            /<command> [create|delete|list|port] [world_name]
-            Example: /<command> create world_name - create a new world named "world_name".
-            Example: /<command> delete world_uuid - delete the world with the given uuid.
-            Example: /<command> list - list all worlds and their uuid.
-            Example: /<command> port world_name - teleport to world "world_name".
-            Example: /<command> delay 300 - sets the teleport delay to 300 seconds.
-            Example: /<command> delay - shows the delay between teleporter uses.
-    ohnoez:
-        description: Set TheNeedfuls ohnoez options.
-        permission: theneedfuls.ohnoez
-        usage:  |
-            /<command> [list|credits|claim|world] [level integer]
-            Example: /<command> list - Show the player's last death inventory.
-            Example: /<command> credits - Show the players available credits.
-            Example: /<command> credits add <player> 1 - add 1 credit for the player.
-            Example: /<command> credits set <player> 0 - set the player's credits to 0.
-            Example: /<command> claim - use an available credit and get your drops back.
-            Example: /<command> worlds - see a list of worlds that death inventory tracking is enabled on.
-            Example: /<command> worlds add world - enable death inventory tracking on world named "world".
-            Example: /<command> worlds remove world - disable death inventory tracking on world named "world".
-    sort:
-        description: Sort your inventory or the targeted object's inventory.
-        permission: theneedfuls.sort
-        aliases: [s]
-        usage:  |
-            Example: /<command> - Sort your inventory or the targeted object's inventory.
+  tnh:
+    description: Get help with TheNeedfuls.
+    permission: theneedfuls.help.*
+    usage:  |
+      /<command> [torch|ice|sheep|xp|ohnoez|help]
+  tnt:
+    description: Set TheNeedfuls torch options.
+    permission: theneedfuls.torch.*
+    usage:  |
+      /<command> [age|refresh|count|expire|worlds] [options]
+      Example: /<command> age 300 - set the maximum torch age to 300 seconds.
+      Example: /<command> refresh 30 - set the torch expiration check to every 30 seconds.
+      Example: /<command> count - see how many torches are being tracked.
+      Example: /<command> expire - expire all torches being tracked.
+      Example: /<command> worlds - see a list of worlds that torch expiration is enabled on.
+      Example: /<command> worlds add world - enable torch expiration on world named "world".
+      Example: /<command> worlds remove world - disable torch expiration on world named "world".
+  tni:
+    description: Set TheNeedfuls ice options.
+    permission: theneedfuls.ice.*
+    usage:  |
+      /<command> [quantity] [1-64]
+      Example: /<command> quantity 32 - set the stack size of the dispensed ice to 32.
+  tnx:
+    description: Set TheNeedfuls experience options.
+    permission: theneedfuls.xp.*
+    usage:  |
+      /<command> [show|give|take|set] [level integer]
+      Example: /<command> show <player> - Show the player's level.
+      Example: /<command> give <player> 5 - add 5 levels to the player.
+      Example: /<command> take <player> 5 - remove 5 levels from the player.
+      Example: /<command> set <player> 5 - set the player's level to 5.
+  tnw:
+    description: Set TheNeedfuls worlds options.
+    permission: theneedfuls.worlds.*
+    usage:  |
+      /<command> [create|delete|list|port] [world_name]
+      Example: /<command> create world_name - create a new world named "world_name".
+      Example: /<command> delete world_uuid - delete the world with the given uuid.
+      Example: /<command> list - list all worlds and their uuid.
+      Example: /<command> port world_name - teleport to world "world_name".
+      Example: /<command> delay 300 - sets the teleport delay to 300 seconds.
+      Example: /<command> delay - shows the delay between teleporter uses.
+  ohnoez:
+    description: Set TheNeedfuls ohnoez options.
+    permission: theneedfuls.ohnoez.*
+    usage:  |
+      /<command> [list|credits|claim|world] [level integer]
+      Example: /<command> list - Show the player's last death inventory.
+      Example: /<command> credits - Show the players available credits.
+      Example: /<command> credits add <player> 1 - add 1 credit for the player.
+      Example: /<command> credits set <player> 0 - set the player's credits to 0.
+      Example: /<command> claim - use an available credit and get your drops back.
+      Example: /<command> worlds - see a list of worlds that death inventory tracking is enabled on.
+      Example: /<command> worlds add world - enable death inventory tracking on world named "world".
+      Example: /<command> worlds remove world - disable death inventory tracking on world named "world".
+  sort:
+    description: Sort your inventory or the targeted object's inventory.
+    permission: theneedfuls.sort
+    aliases: [s]
+    usage:  |
+      Example: /<command> - Sort your inventory or the targeted object's inventory.
 
 permissions:
-    theneedfuls.*:
-        description: Gives access to all TheNeedfuls commands.
-        default: op
-        children:
-            theneedfuls.help.*: true
-            theneedfuls.torch.*: true
-            theneedfuls.ice.*: true
-            theneedfuls.xp.*: true
-            theneedfuls.sheep.*: true
-            theneedfuls.ohnoez.*: true
-            theneedfuls.worlds.*: true
-            theneedfuls.sort: true
-    theneedfuls.help.*:
-        description: Gives access to all TheNeedfuls help commands.
-        default: true
-        children:
-            theneedfuls.help.help: true
-            theneedfuls.help.torch: true
-            theneedfuls.help.ice: true
-            theneedfuls.help.xp: true
-            theneedfuls.help.ohnoez: true
-    theneedfuls.torch.*:
-        description: Gives access to all TheNeedfuls torch commands.
-        default: op
-        children:
-            theneedfuls.torch.age: true
-            theneedfuls.torch.refresh: true
-            theneedfuls.torch.count: true
-            theneedfuls.torch.expire: true
-            theneedfuls.torch.worlds: true
-    theneedfuls.ice.*:
-        description: Gives access to all TheNeedfuls ice commands.
-        default: op
-        children:
-            theneedfuls.ice.quantity: true
-    theneedfuls.sheep.*:
-        description: Gives access to all TheNeedfuls sheep commands.
-        default: op
-        children:
-            theneedfuls.sheep.refresh: true
-    theneedfuls.xp.*:
-        description: Gives access to all TheNeedfuls experience commands.
-        default: op
-        children:
-            theneedfuls.xp.show: true
-            theneedfuls.xp.give: true
-            theneedfuls.xp.take: true
-            theneedfuls.xp.set: true
-    theneedfuls.worlds.*:
-        description: Gives access to all TheNeedfuls worlds commands.
-        default: op
-        children:
-            theneedfuls.worlds.create: true
-            theneedfuls.worlds.delete: true
-            theneedfuls.worlds.list: true
-            theneedfuls.worlds.port: true
-            theneedfuls.worlds.delay: true
-    theneedfuls.ohnoez.*:
-        description: Gives access to all TheNeedfuls ohnoez commands.
-        default: op
-        children:
-            theneedfuls.ohnoez.list: true
-            theneedfuls.ohnoez.credits.*: true
-            theneedfuls.ohnoez.claim: true
-            theneedfuls.ohnoez.worlds: true
-    theneedfuls.help.help:
-        description: Allows you to see help for help.
-        default: true
-    theneedfuls.sort:
-        description: Allows you to sort inventories.
-        default: true
-    theneedfuls.help.torch:
-        description: Allows you to see help for torch.
-        default: true
-    theneedfuls.help.ice:
-        description: Allows you to see help for ice.
-        default: true
-    theneedfuls.help.xp:
-        description: Allows you to see help for xp.
-        default: true
-    theneedfuls.help.ohnoez:
-        description: Allows you to see help for ohnoez.
-        default: true
-    theneedfuls.torch.age:
-        description: Allows you to set the maximum age for torches.
-        default: op
-    theneedfuls.torch.refresh:
-        description: Allows you to set the torch expiration check frequency.
-        default: op
-    theneedfuls.torch.count:
-        description: Allows you to list the number of torches being tracked.
-        default: true
-    theneedfuls.torch.expire:
-        description: Allows you to expire all of the torches being tracked.
-        default: op
-    theneedfuls.torch.worlds:
-        description: Allows you to set the worlds which torch expiration is enabled.
-        default: op
-    theneedfuls.ice.quantity:
-        description: Allows you to set the stack size for the ice being dispensed.
-        default: op
-    theneedfuls.xp.show:
-        description: Allows you to see a player's experience level.
-        default: true
-    theneedfuls.xp.give:
-        description: Allows you to give a player some of your experience levels.
-        default: true
-    theneedfuls.xp.take:
-        description: Allows you to take experience levels from a player.
-        default: op
-    theneedfuls.xp.set:
-        description: Allows you to set another player's experience level.
-        default: op
-    theneedfuls.world.create:
-        description: Allows you to create new worlds.
-        default: true
-    theneedfuls.worlds.delete:
-        description: Allows you to delete worlds.
-        default: true
-    theneedfuls.worlds.list:
-        description: Allows you to list all loaded worlds and their UUID.
-        default: true
-    theneedfuls.worlds.port:
-        description: Allows you to port to a given world.
-        default: op
-    theneedfuls.worlds.delay:
-        description: Allows you to view and set the delay between teleporter uses.
-        default: op
-    theneedfuls.sheep.refresh:
-        description: Allows you to set the sheep unshearing refresh rate.
-        default: op
-    theneedfuls.ohnoez.list:
-        description: Allows you to list your last stored death inventory.
-        default: true
-    theneedfuls.ohnoez.credits.*:
-        description: Gives access to all TheNeedfuls ohnoez credit commands.
-        default: op
-        children:
-            theneedfuls.ohnoez.credits.show: true
-            theneedfuls.ohnoez.credits.add: true
-            theneedfuls.ohnoez.credits.set: true
-    theneedfuls.ohnoez.credits.show:
-        description: Allows you to display the available credits.
-        default: yes
-    theneedfuls.ohnoez.credits.add:
-        description: Allows you to add available credits.
-        default: op
-    theneedfuls.ohnoez.credits.set:
-        description: Allows you to set available credits.
-        default: op
-    theneedfuls.ohnoez.claim:
-        description: Allows you to claim an available credit.
-        default: true
-    theneedfuls.ohnoez.worlds:
-        description: Allows you to set the worlds which death inventory tracking is enabled.
-        default: op
+  theneedfuls.*:
+    description: Gives access to all TheNeedfuls commands.
+    default: true
+    children:
+      theneedfuls.help.*: true
+      theneedfuls.torch.*: true
+      theneedfuls.ice.*: true
+      theneedfuls.xp.*: true
+      theneedfuls.ohnoez.*: true
+      theneedfuls.worlds.*: true
+      theneedfuls.sort: true
+      
+  theneedfuls.help.*:
+    description: Gives access to all TheNeedfuls help commands.
+    default: true
+    children:
+      theneedfuls.help.help: true
+      theneedfuls.help.torch: true
+      theneedfuls.help.ice: true
+      theneedfuls.help.xp: true
+      theneedfuls.help.ohnoez: true
+  theneedfuls.help.help:
+    description: Allows you to see help for help.
+    default: true
+  theneedfuls.sort:
+    description: Allows you to sort inventories.
+    default: true
+  theneedfuls.help.torch:
+    description: Allows you to see help for torch.
+    default: true
+  theneedfuls.help.ice:
+    description: Allows you to see help for ice.
+    default: true
+  theneedfuls.help.xp:
+    description: Allows you to see help for xp.
+    default: true
+  theneedfuls.help.ohnoez:
+    description: Allows you to see help for ohnoez.
+    default: true
+    
+  theneedfuls.torch.*:
+    description: Gives access to all TheNeedfuls torch commands.
+    default: op
+    children:
+      theneedfuls.torch.age: true
+      theneedfuls.torch.refresh: true
+      theneedfuls.torch.count: true
+      theneedfuls.torch.expire: true
+      theneedfuls.torch.worlds: true
+  theneedfuls.torch.age:
+    description: Allows you to set the maximum age for torches.
+    default: op
+  theneedfuls.torch.refresh:
+    description: Allows you to set the torch expiration check frequency.
+    default: op
+  theneedfuls.torch.count:
+    description: Allows you to list the number of torches being tracked.
+    default: true
+  theneedfuls.torch.expire:
+    description: Allows you to expire all of the torches being tracked.
+    default: op
+  theneedfuls.torch.worlds:
+    description: Allows you to set the worlds which torch expiration is enabled.
+    default: op
+    
+  theneedfuls.ice.*:
+    description: Gives access to all TheNeedfuls ice commands.
+    default: op
+    children:
+      theneedfuls.ice.quantity: true
+  theneedfuls.ice.quantity:
+    description: Allows you to set the stack size for the ice being dispensed.
+    default: op
+      
+  theneedfuls.xp.*:
+    description: Gives access to all TheNeedfuls experience commands.
+    default: op
+    children:
+      theneedfuls.xp.show: true
+      theneedfuls.xp.give: true
+      theneedfuls.xp.take: true
+      theneedfuls.xp.set: true
+  theneedfuls.xp.show:
+    description: Allows you to see a player's experience level.
+    default: true
+  theneedfuls.xp.give:
+    description: Allows you to give a player some of your experience levels.
+    default: true
+  theneedfuls.xp.take:
+    description: Allows you to take experience levels from a player.
+    default: op
+  theneedfuls.xp.set:
+    description: Allows you to set another player's experience level.
+    default: op
+    
+  theneedfuls.worlds.*:
+    description: Gives access to all TheNeedfuls worlds commands.
+    default: op
+    children:
+      theneedfuls.worlds.create: true
+      theneedfuls.worlds.delete: true
+      theneedfuls.worlds.list: true
+      theneedfuls.worlds.port: true
+      theneedfuls.worlds.delay: true
+  theneedfuls.worlds.create:
+    description: Allows you to create new worlds.
+    default: op
+  theneedfuls.worlds.delete:
+    description: Allows you to delete worlds.
+    default: op
+  theneedfuls.worlds.list:
+    description: Allows you to list all loaded worlds and their UUID.
+    default: true
+  theneedfuls.worlds.port:
+    description: Allows you to port to a given world.
+    default: op
+  theneedfuls.worlds.delay:
+    description: Allows you to view and set the delay between teleporter uses.
+    default: op
+    
+  theneedfuls.ohnoez.*:
+    description: Gives access to all TheNeedfuls ohnoez commands.
+    default: op
+    children:
+      theneedfuls.ohnoez.list: true
+      theneedfuls.ohnoez.credits: true
+      theneedfuls.ohnoez.addcredits: true
+      theneedfuls.ohnoez.setcredits: true
+      theneedfuls.ohnoez.claim: true
+      theneedfuls.ohnoez.worlds: true
+  theneedfuls.ohnoez.list:
+    description: Allows you to list your last stored death inventory.
+    default: true
+  theneedfuls.ohnoez.credits:
+    description: Allows you to view available cresits.
+    default: true
+  theneedfuls.ohnoez.addcredits:
+    description: Allows you to add available credits.
+    default: op
+  theneedfuls.ohnoez.setcredits:
+    description: Allows you to set available credits.
+    default: op
+  theneedfuls.ohnoez.claim:
+    description: Allows you to claim an available credit.
+    default: true
+  theneedfuls.ohnoez.worlds:
+    description: Allows you to set the worlds which death inventory tracking is enabled.
+    default: op

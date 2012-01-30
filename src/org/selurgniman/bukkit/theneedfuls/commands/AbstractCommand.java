@@ -50,43 +50,24 @@ public abstract class AbstractCommand implements CommandExecutor {
 					break;
 				}
 			}
-		} catch (IllegalArgumentException ex) {
-			return false;
-		} catch (ArrayIndexOutOfBoundsException ex) {
-			return false;
+		} catch (IllegalArgumentException | ArrayIndexOutOfBoundsException ex) {
 		}
+
+		String commandPermission = command.getPermission().replace(".*", "");
 		if (operation == null) {
-			return false;
-		}
-
-		String option = "";
-		if (args.length > 1) {
-			option = args[1].toLowerCase();
-		}
-
-		if (option.equalsIgnoreCase("help")) {
-			sender.sendMessage(operation.getHelp());
-			sender.sendMessage(operation.getUsage());
-
+			if (!sender.hasPermission(command.getPermission())) {
+				sender.sendMessage(Message.LACK_PERMISSION_MESSAGE.with(commandPermission));
+				return true;
+			}
+		} else if (!sender.hasPermission(commandPermission + "." + operation.toString().toLowerCase())) {
+			sender.sendMessage(Message.LACK_PERMISSION_MESSAGE.with(commandPermission + "." + operation.toString().toLowerCase()));
 			return true;
 		}
 
-		if (!option.isEmpty() && plugin.getServer().getPlayer(option) == null) {
-			if (!sender.hasPermission(command.getPermission() + "." + operation.toString().toLowerCase() + "." + option)) {
-				sender.sendMessage(String.format(Message.LACK_PERMISSION_MESSAGE.toString(), command.getPermission(), operation.toString().toLowerCase()
-						+ "."
-						+ option));
-				return false;
-			}
-		} else if (!sender.hasPermission(command.getPermission() + "." + operation.toString().toLowerCase())) {
-			sender.sendMessage(String.format(Message.LACK_PERMISSION_MESSAGE.toString(), command.getPermission(), operation.toString().toLowerCase()));
-			return false;
-		}
-
-		return processCommand(sender, command, label, args, operation, option);
+		return processCommand(sender, command, label, args, operation);
 	}
 
-	abstract public boolean processCommand(CommandSender sender, Command command, String label, String[] args, ISubCommand operation, String option);
+	abstract public boolean processCommand(CommandSender sender, Command command, String label, String[] args, ISubCommand operation);
 
 	public void setSubCommands(ISubCommand[] subCommands) {
 		this.subCommands = subCommands;
@@ -139,8 +120,8 @@ public abstract class AbstractCommand implements CommandExecutor {
 		plugin.saveConfig();
 		plugin.getModel().loadWorldControls();
 	}
-	
-	public TheNeedfuls getPlugin(){
+
+	public TheNeedfuls getPlugin() {
 		return this.plugin;
 	}
 }

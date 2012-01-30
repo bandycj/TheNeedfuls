@@ -18,8 +18,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -32,18 +34,18 @@ import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
  * @author <a href="mailto:selurgniman@selurgniman.org">Selurgniman</a> Created
  *         on: Dec 26, 2011
  */
-public class WorldsPlayerListener extends PlayerListener {
+public class WorldsListener implements Listener {
 	private final TheNeedfuls plugin;
 	private final WorldsModel worldsModel;
 	private final Pattern signPattern = Pattern.compile("^\\[(.*)\\]$");
 	private final IdentityHashMap<Player, Date> playersTeleported = new IdentityHashMap<Player, Date>();
 
-	public WorldsPlayerListener(TheNeedfuls plugin) {
+	public WorldsListener(TheNeedfuls plugin) {
 		this.plugin = plugin;
 		this.worldsModel = (WorldsModel) Model.getCommandModel(CommandType.WORLDS);
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (!event.isCancelled()) {
 			Block clickedBlock = event.getClickedBlock();
@@ -57,18 +59,18 @@ public class WorldsPlayerListener extends PlayerListener {
 					World world = plugin.getServer().getWorld(worldName);
 					if (world != null && world.getEnvironment() == player.getWorld().getEnvironment()) {
 						player.teleport(world.getSpawnLocation(), TeleportCause.PLUGIN);
-						player.sendMessage(String.format(Message.WORLD_TELEPORT_MESSAGE.toString(), worldName));
+						player.sendMessage(Message.WORLD_TELEPORT_MESSAGE.with(worldName));
 						playersTeleported.put(player, new Date());
 						event.setCancelled(true);
 					} else {
-						player.sendMessage(String.format(Message.WORLD_UNKNOWN_MESSAGE.toString(), worldName));
+						player.sendMessage(Message.WORLD_UNKNOWN_MESSAGE.with(worldName));
 					}
 				}
 			}
 		}
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerPortal(PlayerPortalEvent event) {
 		if (!event.isCancelled() && event.getTo() == null) {
 			World currentWorld = event.getFrom().getWorld();
@@ -109,7 +111,7 @@ public class WorldsPlayerListener extends PlayerListener {
 		}
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
 		if (!event.isCancelled()) {
 			checkInventory(event);
@@ -177,7 +179,7 @@ public class WorldsPlayerListener extends PlayerListener {
 
 			if (playersTeleported.get(player).after(now)) {
 				Long timeRemaining = (playersTeleported.get(player).getTime() - now.getTime()) / 1000;
-				player.sendMessage(String.format(Message.WORLD_DELAY_MESSAGE.toString(), timeRemaining));
+				player.sendMessage(Message.WORLD_DELAY_MESSAGE.with(timeRemaining));
 				return false;
 			}
 			return true;

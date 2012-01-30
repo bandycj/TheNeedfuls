@@ -8,7 +8,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
 import org.selurgniman.bukkit.theneedfuls.parts.ice.IceCommand.IceSubCommand;
-import org.selurgniman.bukkit.theneedfuls.parts.misc.SheepCommand.SheepSubCommand;
 import org.selurgniman.bukkit.theneedfuls.parts.misc.XpCommand.XpSubCommand;
 import org.selurgniman.bukkit.theneedfuls.parts.ohnoez.OhNoezCommand.OhNoezSubCommand;
 import org.selurgniman.bukkit.theneedfuls.parts.torch.TorchCommand.TorchSubCommand;
@@ -33,19 +32,16 @@ public class HelpCommand extends AbstractCommand {
 	 * , org.bukkit.command.Command, java.lang.String, java.lang.String[])
 	 */
 	@Override
-	public boolean processCommand(CommandSender sender, Command command, String label, String[] args, ISubCommand operation, String option) {
+	public boolean processCommand(CommandSender sender, Command command, String label, String[] args, ISubCommand operation) {
 		try {
 			if (operation instanceof HelpSubCommand) {
-				option = option.toUpperCase();
+				String option = args[0].toUpperCase();
 				switch ((HelpSubCommand) operation) {
 					case TORCH: {
 						sendHelp(sender, TorchSubCommand.valueOf(option));
 					}
 					case ICE: {
 						sendHelp(sender, IceSubCommand.valueOf(option));
-					}
-					case SHEEP: {
-						sendHelp(sender, SheepSubCommand.valueOf(option));
 					}
 					case XP: {
 						sendHelp(sender, XpSubCommand.valueOf(option));
@@ -65,9 +61,9 @@ public class HelpCommand extends AbstractCommand {
 				}
 			}
 			return true;
-		} catch (IllegalArgumentException ex) {
-
+		} catch (NumberFormatException | ArrayIndexOutOfBoundsException ex) {
 		}
+
 		return false;
 	}
 
