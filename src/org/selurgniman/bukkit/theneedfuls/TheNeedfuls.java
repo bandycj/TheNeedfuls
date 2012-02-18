@@ -28,6 +28,7 @@ import org.selurgniman.bukkit.theneedfuls.parts.enchantingrepair.EnchantingRepai
 import org.selurgniman.bukkit.theneedfuls.parts.ice.IceCommand;
 import org.selurgniman.bukkit.theneedfuls.parts.ice.IceListener;
 import org.selurgniman.bukkit.theneedfuls.parts.misc.DropEnhancerListener;
+import org.selurgniman.bukkit.theneedfuls.parts.misc.SignPlacerListener;
 import org.selurgniman.bukkit.theneedfuls.parts.misc.SortCommand;
 import org.selurgniman.bukkit.theneedfuls.parts.misc.XpCommand;
 import org.selurgniman.bukkit.theneedfuls.parts.ohnoez.OhNoezCommand;
@@ -39,6 +40,7 @@ import org.selurgniman.bukkit.theneedfuls.parts.weather.WeatherListener;
 import org.selurgniman.bukkit.theneedfuls.parts.worlds.WorldsCommand;
 import org.selurgniman.bukkit.theneedfuls.parts.worlds.WorldsListener;
 import org.selurgniman.bukkit.theneedfuls.recipes.GlowstoneRecipe;
+import org.selurgniman.bukkit.theneedfuls.recipes.NetherBrickRecipe;
 
 import com.avaje.ebean.EbeanServer;
 
@@ -158,6 +160,7 @@ public class TheNeedfuls extends JavaPlugin {
 		pm.registerEvents(new DropEnhancerListener(), this);
 		pm.registerEvents(new WorldsListener(this), this);
 		pm.registerEvents(new WeatherListener(), this);
+		pm.registerEvents(new SignPlacerListener(), this);
 	}
 
 	private void setCommandExecutors() {
@@ -175,6 +178,7 @@ public class TheNeedfuls extends JavaPlugin {
 
 	private void addRecipes() {
 		this.getServer().addRecipe(new GlowstoneRecipe());
+		this.getServer().addRecipe(new NetherBrickRecipe());
 		log.info(Message.PREFIX + " loaded recipes.");
 	}
 
