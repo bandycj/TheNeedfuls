@@ -27,6 +27,7 @@ import org.selurgniman.bukkit.theneedfuls.model.dao.Torch;
 import org.selurgniman.bukkit.theneedfuls.parts.enchantingrepair.EnchantingRepairListener;
 import org.selurgniman.bukkit.theneedfuls.parts.ice.IceCommand;
 import org.selurgniman.bukkit.theneedfuls.parts.ice.IceListener;
+import org.selurgniman.bukkit.theneedfuls.parts.misc.DebugCommand;
 import org.selurgniman.bukkit.theneedfuls.parts.misc.DropEnhancerListener;
 import org.selurgniman.bukkit.theneedfuls.parts.misc.SignPlacerListener;
 import org.selurgniman.bukkit.theneedfuls.parts.misc.SortCommand;
@@ -49,16 +50,25 @@ import com.avaje.ebean.EbeanServer;
  *         on: Dec 18, 2011
  */
 public class TheNeedfuls extends JavaPlugin {
-	private final Logger log = Logger.getLogger("Minecraft");
-	public static final BlockFace[] BLOCKFACES = new BlockFace[] { BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.NORTH_WEST, BlockFace.EAST, BlockFace.WEST,
-			BlockFace.SOUTH, BlockFace.SOUTH_EAST, BlockFace.SOUTH_WEST };
+	private static final Logger log = Logger.getLogger("Minecraft");
+	public static final BlockFace[] BLOCKFACES = new BlockFace[] {
+			BlockFace.NORTH,
+			BlockFace.NORTH_EAST,
+			BlockFace.NORTH_WEST,
+			BlockFace.EAST,
+			BlockFace.WEST,
+			BlockFace.SOUTH,
+			BlockFace.SOUTH_EAST,
+			BlockFace.SOUTH_WEST
+	};
 	private static final LinkedHashMap<String, Object> CONFIG_DEFAULTS = new LinkedHashMap<String, Object>();
 	private Model model = null;
 	private TheNeedfuls plugin = null;
 	private int torchTaskId = -1;
+	private static boolean isDebug = false;
 
 	static {
-//		CONFIG_DEFAULTS.put(AfkCommand.CONFIG_AFK_DELAY, 300);
+		// CONFIG_DEFAULTS.put(AfkCommand.CONFIG_AFK_DELAY, 300);
 		CONFIG_DEFAULTS.put(SortCommand.CONFIG_SORT_DISTANCE, 5);
 		CONFIG_DEFAULTS.put(IceCommand.CONFIG_ICE_QUANTITY, 64);
 		CONFIG_DEFAULTS.put(WorldsCommand.CONFIG_TELEPORT_DELAY, 300);
@@ -66,6 +76,8 @@ public class TheNeedfuls extends JavaPlugin {
 		CONFIG_DEFAULTS.put(Torch.TORCH_REFRESH_KEY, 30);
 		CONFIG_DEFAULTS.put(Torch.TORCH_AGE_KEY, 300);
 		CONFIG_DEFAULTS.put(Torch.TORCH_WORLDS_KEY, Collections.EMPTY_LIST);
+		CONFIG_DEFAULTS.put("Debug", false);
+		CONFIG_DEFAULTS.put("DebugPlayer", false);
 		for (Entry<String, Message> entry : Message.values()) {
 			CONFIG_DEFAULTS.put(entry.getKey(), entry.getValue().toString());
 		}
@@ -74,7 +86,7 @@ public class TheNeedfuls extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		this.saveConfig();
-		log.info(Message.PREFIX + " disabled.");
+		log("disabled.");
 	}
 
 	@Override
@@ -95,7 +107,7 @@ public class TheNeedfuls extends JavaPlugin {
 
 		saveConfig();
 		PluginDescriptionFile pdfFile = this.getDescription();
-		log.info(Message.PREFIX + pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled!");
+		log(pdfFile.getName() + "version " + pdfFile.getVersion() + "is enabled!");
 	}
 
 	private void loadWorlds() {
@@ -122,10 +134,11 @@ public class TheNeedfuls extends JavaPlugin {
 				counter++;
 			}
 		}
-		log.info(Message.PREFIX + " loaded " + ChatColor.GREEN + counter + ChatColor.WHITE + " worlds.");
+		log("loaded " + ChatColor.GREEN + counter + ChatColor.WHITE + "worlds.");
 	}
 
 	private void initConfig() {
+		getConfig();
 		if (!this.getDataFolder().exists()) {
 			this.getDataFolder().mkdir();
 		}
@@ -136,7 +149,14 @@ public class TheNeedfuls extends JavaPlugin {
 		}
 
 		Message.setConfig(this.getConfig());
-		log.info(Message.PREFIX + " config initialized.");
+
+		log("config initialized.");
+	}
+	
+	@Override
+	public void reloadConfig(){
+		super.reloadConfig();
+		TheNeedfuls.isDebug = this.getConfig().getBoolean("Debug");
 	}
 
 	private void setupDatabase() {
@@ -145,14 +165,14 @@ public class TheNeedfuls extends JavaPlugin {
 				model.getDatabase().find(dbClass).findRowCount();
 			}
 		} catch (PersistenceException ex) {
-			log.info("Installing database for " + getDescription().getName() + " due to first time usage");
+			log("Installing database for " + getDescription().getName() + "due to first time usage.");
 			installDDL();
 		}
 	}
 
 	private void registerEvents() {
 		PluginManager pm = getServer().getPluginManager();
-//		pm.registerEvent(new AfkPlayerListener(this);, this);
+		// pm.registerEvent(new AfkPlayerListener(this);, this);
 		pm.registerEvents(new EnchantingRepairListener(), this);
 		pm.registerEvents(new OhNoezListener(model), this);
 		pm.registerEvents(new TorchListener(model), this);
@@ -171,15 +191,20 @@ public class TheNeedfuls extends JavaPlugin {
 		this.getCommand("tnw").setExecutor(new WorldsCommand(this));
 		this.getCommand("ohnoez").setExecutor(new OhNoezCommand(this));
 		this.getCommand("sort").setExecutor(new SortCommand(this));
-//		this.getCommand("afk").setExecutor(new AfkCommand(this));
+		this.getCommand("tnd").setExecutor(new DebugCommand(this));
+		// this.getCommand("afk").setExecutor(new AfkCommand(this));
 
-		log.info(Message.PREFIX + " set command executors.");
+		log("set command executors.");
 	}
 
 	private void addRecipes() {
 		this.getServer().addRecipe(new GlowstoneRecipe());
 		this.getServer().addRecipe(new NetherBrickRecipe());
-		log.info(Message.PREFIX + " loaded recipes.");
+		log("loaded recipes.");
+	}
+
+	private boolean isDebug() {
+		return this.getConfig().getBoolean("Debug");
 	}
 
 	public void initTorchTask() {
@@ -193,7 +218,7 @@ public class TheNeedfuls extends JavaPlugin {
 				((TorchModel) Model.getCommandModel(CommandType.TORCH)).expireTorches();
 			}
 		}, 60L, this.getConfig().getLong(Torch.TORCH_REFRESH_KEY) * 20);
-		log.info(Message.PREFIX + " torch expiration task started with id " + torchTaskId + ".");
+		log("torch expiration task started with id " + torchTaskId + ".");
 	}
 
 	public Model getModel() {
@@ -203,5 +228,15 @@ public class TheNeedfuls extends JavaPlugin {
 	@Override
 	public EbeanServer getDatabase() {
 		return model.getDatabase();
+	}
+
+	public static void log(String message) {
+		log.info(Message.PREFIX + " " + message);
+	}
+
+	public static void debug(String message) {
+		if (isDebug) {
+			log("DEBUG: " + message);
+		}
 	}
 }

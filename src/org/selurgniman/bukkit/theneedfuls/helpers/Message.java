@@ -164,6 +164,7 @@ public class Message {
 			+ "%2$s"
 			+ ChatColor.WHITE
 			+ ")");
+	public static Message DEBUG_MESSAGE = new Message("DEBUG_MESSAGE", PREFIX + "Debugging to: console %1$s, ops %2$s");
 
 	private static Configuration config = null;
 	private static ConcurrentSkipListMap<String, Message> values = new ConcurrentSkipListMap<String, Message>();
@@ -197,6 +198,7 @@ public class Message {
 		values.put(WORLD_UNKNOWN_MESSAGE.getKey(), WORLD_UNKNOWN_MESSAGE);
 		values.put(WORLD_DELAY_MESSAGE.getKey(), WORLD_DELAY_MESSAGE);
 		values.put(WORLD_CHILDREN_MESSAGE.getKey(), WORLD_CHILDREN_MESSAGE);
+		values.put(DEBUG_MESSAGE.getKey(), DEBUG_MESSAGE);
 	}
 
 	private final String key;

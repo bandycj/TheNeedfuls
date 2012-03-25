@@ -45,14 +45,31 @@ public class WorldsModel extends AbstractCommandModel {
 		int counter = 0;
 		for (ItemStack item : player.getInventory().getContents()) {
 			if (item != null) {
-				inventoryItems.add(createInventoryItem(item, counter, player, worldId));
+				InventoryItem inventoryItem = createInventoryItem(item, counter, player, worldId);
+				if (inventoryItem != null){
+					inventoryItems.add(inventoryItem);
+				}
 			}
 			counter++;
 		}
-		inventoryItems.add(createInventoryItem(inventory.getHelmet(), -4, player, worldId));
-		inventoryItems.add(createInventoryItem(inventory.getChestplate(), -3, player, worldId));
-		inventoryItems.add(createInventoryItem(inventory.getLeggings(), -2, player, worldId));
-		inventoryItems.add(createInventoryItem(inventory.getBoots(), -1, player, worldId));
+		InventoryItem helmet = createInventoryItem(inventory.getHelmet(), -4, player, worldId);
+		InventoryItem chest = createInventoryItem(inventory.getChestplate(), -3, player, worldId);
+		InventoryItem legs = createInventoryItem(inventory.getLeggings(), -2, player, worldId);
+		InventoryItem boots = createInventoryItem(inventory.getBoots(), -1, player, worldId);
+		
+		if (helmet != null){
+			inventoryItems.add(helmet);
+		}
+		if (chest != null){
+			inventoryItems.add(chest);
+		}
+		if (legs != null){
+			inventoryItems.add(legs);
+		}
+		if (boots != null){
+			inventoryItems.add(boots);
+		}
+			
 
 		getPlugin().getDatabase().save(inventoryItems);
 		inventory.clear();
@@ -90,21 +107,24 @@ public class WorldsModel extends AbstractCommandModel {
 	}
 
 	private InventoryItem createInventoryItem(ItemStack item, int slot, Player player, String worldId) {
-		int itemId = item.getTypeId();
-		int itemCount = item.getAmount();
-		int itemData = item.getData().getData();
-		int itemDurability = item.getDurability();
-		InventoryItem inventoryItem = new InventoryItem(player.getName(), itemId, itemCount, itemData, itemDurability, slot, worldId);
+		if (item != null && player != null && worldId != null && !worldId.isEmpty()) {
+			int itemId = item.getTypeId();
+			int itemCount = item.getAmount();
+			int itemData = item.getData().getData();
+			int itemDurability = item.getDurability();
+			InventoryItem inventoryItem = new InventoryItem(player.getName(), itemId, itemCount, itemData, itemDurability, slot, worldId);
 
-		ArrayList<InventoryEnchant> enchants = new ArrayList<InventoryEnchant>();
-		for (Entry<Enchantment, Integer> entry : item.getEnchantments().entrySet()) {
-			int id = entry.getKey().getId();
-			int level = entry.getValue();
-			enchants.add(new InventoryEnchant(id, level, inventoryItem));
+			ArrayList<InventoryEnchant> enchants = new ArrayList<InventoryEnchant>();
+			for (Entry<Enchantment, Integer> entry : item.getEnchantments().entrySet()) {
+				int id = entry.getKey().getId();
+				int level = entry.getValue();
+				enchants.add(new InventoryEnchant(id, level, inventoryItem));
+			}
+			inventoryItem.setEnchants(enchants);
+
+			return inventoryItem;
 		}
-		inventoryItem.setEnchants(enchants);
-
-		return inventoryItem;
+		return null;
 	}
 
 	private ItemStack createItemStack(InventoryItem inventoryItem) {

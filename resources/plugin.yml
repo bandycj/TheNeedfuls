@@ -1,5 +1,5 @@
 name: TheNeedfuls
-version: 0.6
+version: 0.9
 author: Selurgniman
 main: org.selurgniman.bukkit.theneedfuls.TheNeedfuls
 
@@ -68,6 +68,14 @@ commands:
     aliases: [s]
     usage:  |
       Example: /<command> - Sort your inventory or the targeted object's inventory.
+  tnd:
+    description: Set TheNeedfuls debug logging options.
+    permission: theneedfuls.tnd
+    aliases: [d]
+    usage:  |
+      Example: /<command> on - Enable debugging to the console.
+      Example: /<command> off - Disable debugging to the console.
+      Example: /<command> on - Toggle debugging to ops when debugging is enabled.
 
 permissions:
   theneedfuls.*:
@@ -81,6 +89,7 @@ permissions:
       theneedfuls.ohnoez.*: true
       theneedfuls.worlds.*: true
       theneedfuls.sort: true
+      theneedfuls.tnd: true
       
   theneedfuls.help.*:
     description: Gives access to all TheNeedfuls help commands.
@@ -97,6 +106,9 @@ permissions:
   theneedfuls.sort:
     description: Allows you to sort inventories.
     default: true
+  theneedfuls.tnd:
+    description: Allows you to control debugging output.
+    default: op
   theneedfuls.help.torch:
     description: Allows you to see help for torch.
     default: true

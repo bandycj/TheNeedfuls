@@ -6,6 +6,8 @@ package org.selurgniman.bukkit.theneedfuls.parts.torch;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -14,7 +16,7 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.getspout.spoutapi.event.inventory.InventoryCraftEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.selurgniman.bukkit.theneedfuls.helpers.Message;
 import org.selurgniman.bukkit.theneedfuls.model.Model;
 import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
@@ -78,13 +80,15 @@ public class TorchListener implements Listener {
 	}
 	
 	@EventHandler(priority = EventPriority.NORMAL)
-	public void onInventoryCraft(InventoryCraftEvent event) {
-		if (!event.isCancelled() && event.getResult() != null) {
-			Material type = event.getResult().getType();
+	public void onCraftItem(CraftItemEvent event) {
+		if (!event.isCancelled() && event.getCurrentItem() != null && event.getWhoClicked() instanceof Player) {
+			Player player = (Player)event.getWhoClicked();
+			Material type = event.getCurrentItem().getType();
 			if (type == Material.GLOWSTONE || type == Material.PUMPKIN_SEEDS) {
-				if (pluginModel.isCommandWorld(CommandType.TORCH, event.getPlayer().getWorld())) {
-					event.getPlayer().sendMessage(Message.TORCH_DENY_MESSAGE.toString());
+				if (pluginModel.isCommandWorld(CommandType.TORCH, player.getWorld())) {
+					player.sendMessage(Message.TORCH_DENY_MESSAGE.toString());
 					event.setCancelled(true);
+					event.setResult(Result.DENY);
 				}
 			}
 		}
