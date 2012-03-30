@@ -1,5 +1,5 @@
 name: TheNeedfuls
-version: 0.9
+version: 0.11
 author: Selurgniman
 main: org.selurgniman.bukkit.theneedfuls.TheNeedfuls
 
@@ -56,8 +56,8 @@ commands:
       /<command> [list|credits|claim|world] [level integer]
       Example: /<command> list - Show the player's last death inventory.
       Example: /<command> credits - Show the players available credits.
-      Example: /<command> credits add <player> 1 - add 1 credit for the player.
-      Example: /<command> credits set <player> 0 - set the player's credits to 0.
+      Example: /<command> addcredits <player> 1 - add 1 credit for the player.
+      Example: /<command> setcredits <player> 0 - set the player's credits to 0.
       Example: /<command> claim - use an available credit and get your drops back.
       Example: /<command> worlds - see a list of worlds that death inventory tracking is enabled on.
       Example: /<command> worlds add world - enable death inventory tracking on world named "world".

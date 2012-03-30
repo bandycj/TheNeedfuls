@@ -116,47 +116,47 @@ public class OhNoezModel extends AbstractCommandModel {
 	}
 
 	public void setLastInventory(PlayerDeathEvent event) {
-		try{
-		if (getPlugin() == null)
-			return;
+		try {
+			if (getPlugin() == null)
+				return;
 
-		Player player = (Player) event.getEntity();
-		Credit creditClass = getRecordForPlayer(player);
-		ArrayList<InventoryItem> drops = new ArrayList<InventoryItem>();
-		int itemId = -2;
-		int itemCount = player.getLevel();
-		int itemData = 0;
-		int itemDurability = event.getDroppedExp();
-		// Weird bukkit bug when xp is manually adjust it reports progress
-		// toward the next level as 100 when it should be 0.
-		if (itemDurability == 100) {
-			itemDurability = 0;
-		}
-		String worldId = player.getWorld().getUID().toString();
-		drops.add(new InventoryItem(creditClass, itemId, itemCount, itemData, itemDurability, -99, worldId));
-		
-		int counter = 0;
-		for (ItemStack item : event.getDrops()) {
-			itemId = item.getTypeId();
-			itemCount = item.getAmount();
-			itemData = item.getData().getData();
-			itemDurability = item.getDurability();
-			InventoryItem drop = new InventoryItem(creditClass, itemId, itemCount, itemData, itemDurability, counter, worldId);
-
-			ArrayList<InventoryEnchant> enchants = new ArrayList<InventoryEnchant>();
-			for (Entry<Enchantment, Integer> entry : item.getEnchantments().entrySet()) {
-				int id = entry.getKey().getId();
-				int level = entry.getValue();
-				enchants.add(new InventoryEnchant(id, level, drop));
+			Player player = (Player) event.getEntity();
+			Credit creditClass = getRecordForPlayer(player);
+			ArrayList<InventoryItem> drops = new ArrayList<InventoryItem>();
+			int itemId = -2;
+			int itemCount = player.getLevel();
+			int itemData = 0;
+			int itemDurability = event.getDroppedExp();
+			// Weird bukkit bug when xp is manually adjust it reports progress
+			// toward the next level as 100 when it should be 0.
+			if (itemDurability == 100) {
+				itemDurability = 0;
 			}
-			drop.setEnchants(enchants);
+			String worldId = player.getWorld().getUID().toString();
+			drops.add(new InventoryItem(creditClass, itemId, itemCount, itemData, itemDurability, -99, worldId));
 
-			drops.add(drop);
-			counter++;
-		}
-		
-		getPlugin().getDatabase().save(drops);
-		} catch (Exception e){
+			int counter = 0;
+			for (ItemStack item : event.getDrops()) {
+				itemId = item.getTypeId();
+				itemCount = item.getAmount();
+				itemData = item.getData().getData();
+				itemDurability = item.getDurability();
+				InventoryItem drop = new InventoryItem(creditClass, itemId, itemCount, itemData, itemDurability, counter, worldId);
+
+				ArrayList<InventoryEnchant> enchants = new ArrayList<InventoryEnchant>();
+				for (Entry<Enchantment, Integer> entry : item.getEnchantments().entrySet()) {
+					int id = entry.getKey().getId();
+					int level = entry.getValue();
+					enchants.add(new InventoryEnchant(id, level, drop));
+				}
+				drop.setEnchants(enchants);
+
+				drops.add(drop);
+				counter++;
+			}
+
+			getPlugin().getDatabase().save(drops);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -164,18 +164,23 @@ public class OhNoezModel extends AbstractCommandModel {
 	private Credit getRecordForPlayer(Player player) {
 		if (getPlugin() == null)
 			return null;
+		try {
+			String name = player.getName();
+			Credit creditClass = getPlugin().getDatabase().find(Credit.class).where().ieq("player_name", name).findUnique();
+			if (creditClass == null) {
+				creditClass = new Credit();
+				creditClass.setPlayer(player);
+				creditClass.setCredits(getPlugin().getConfig().getInt("credits", 1));
 
-		String name = player.getName();
-		Credit creditClass = getPlugin().getDatabase().find(Credit.class).where().ieq("player_name", name).findUnique();
-		if (creditClass == null) {
-			creditClass = new Credit();
-			creditClass.setPlayer(player);
-			creditClass.setCredits(getPlugin().getConfig().getInt("credits", 1));
+				getPlugin().getDatabase().save(creditClass);
+			}
 
-			getPlugin().getDatabase().save(creditClass);
+			return creditClass;
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
-		return creditClass;
+		return null;
 	}
 
 	public String getPlayerDamageCause(EntityDamageEvent event) {

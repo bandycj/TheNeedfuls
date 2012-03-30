@@ -41,28 +41,37 @@ public abstract class AbstractCommand implements CommandExecutor {
 		if (subCommands == null) {
 			return false;
 		}
-
 		ISubCommand operation = null;
-		try {
-			for (ISubCommand subCommand : subCommands) {
-				if (subCommand.toString().equals(args[0].toUpperCase())) {
-					operation = subCommand;
-					break;
-				}
-			}
-		} catch (IllegalArgumentException | ArrayIndexOutOfBoundsException ex) {
-		}
 
 		String commandPermission = command.getPermission().replace(".*", "");
-		if (operation == null) {
+		if (args.length < 1) {
 			if (!sender.hasPermission(command.getPermission())) {
 				sender.sendMessage(Message.LACK_PERMISSION_MESSAGE.with(commandPermission));
 				return true;
 			}
-		} else if (!sender.hasPermission(commandPermission + "." + operation.toString().toLowerCase())) {
-			sender.sendMessage(Message.LACK_PERMISSION_MESSAGE.with(commandPermission + "." + operation.toString().toLowerCase()));
-			return true;
+		} else {
+			try {
+				for (ISubCommand subCommand : subCommands) {
+					if (subCommand.toString().equals(args[0].toUpperCase())) {
+						operation = subCommand;
+						commandPermission += "." + subCommand.toString().toLowerCase();
+						break;
+					}
+				}
+			} catch (IllegalArgumentException | ArrayIndexOutOfBoundsException ex) {
+			}
+
+			if (args.length > 1) {
+				commandPermission += "." + args[1].toLowerCase();
+			}
+
+			if (!sender.hasPermission(commandPermission)) {
+				sender.sendMessage(Message.LACK_PERMISSION_MESSAGE.with(commandPermission));
+				return true;
+			}
 		}
+
+		TheNeedfuls.debug(commandPermission + ":" + sender.hasPermission(commandPermission));
 
 		return processCommand(sender, command, label, args, operation);
 	}

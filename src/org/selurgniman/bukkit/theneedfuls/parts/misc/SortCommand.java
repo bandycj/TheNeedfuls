@@ -54,49 +54,28 @@ public class SortCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (sender instanceof Player && sender.hasPermission("theneedfuls.sort")) {
 			Player player = (Player) sender;
-			ArrayList<Inventory> inventories = new ArrayList<Inventory>();
+			Inventory inventory = player.getInventory();
+			
 			Block playerTarget = player.getTargetBlock(null, plugin.getConfig().getInt(CONFIG_SORT_DISTANCE));
 			if (playerTarget.getType() == Material.CHEST) {
 				Chest chest = (Chest) playerTarget.getState();
-				BlockFace[] sides = new BlockFace[] { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST };
-				for (BlockFace blockFace : sides) {
-					Block relative = playerTarget.getRelative(blockFace);
-					if (relative.getType() == Material.CHEST) {
-						Chest relativeChest = (Chest) relative.getState();
-						if (blockFace == BlockFace.NORTH || blockFace == BlockFace.EAST) {
-							inventories.add(relativeChest.getInventory());
-							inventories.add(chest.getInventory());
-						} else {
-							inventories.add(chest.getInventory());
-							inventories.add(relativeChest.getInventory());
-						}
-					}
-				}
-			} else {
-				inventories.add(player.getInventory());
+				inventory = chest.getInventory();
 			}
-
-			if (inventories.size() < 1) {
-				return false;
-			}
-			for (Inventory inventory : inventories) {
-				if (inventory == null) {
-					return false;
-				}
-			}
-
-			executorService.submit(new Sorter(inventories, sender));
+			
+			if (inventory == null) return false;
+			
+			executorService.submit(new Sorter(inventory, sender));
 			return true;
 		}
 		return false;
 	}
 
 	private class Sorter implements Runnable {
-		private final ArrayList<Inventory> inventories;
+		private final Inventory inventory;
 		private final CommandSender sender;
 
-		public Sorter(ArrayList<Inventory> inventories, CommandSender sender) {
-			this.inventories = inventories;
+		public Sorter(Inventory inventory, CommandSender sender) {
+			this.inventory = inventory;
 			this.sender = sender;
 		}
 
@@ -108,19 +87,15 @@ public class SortCommand implements CommandExecutor {
 		@Override
 		public void run() {
 			ItemStack[] hotbar = new ItemStack[9];
-			ItemStack[] itemStacks = new ItemStack[0];
+			ItemStack[] itemStacks = inventory.getContents();
 			String sortTargetType = ChatColor.GOLD + "container";
-			for (Inventory inventory : inventories) {
-				itemStacks = concat(itemStacks, inventory.getContents());
-
-				if (inventory instanceof PlayerInventory) {
-					hotbar = Arrays.copyOfRange(itemStacks, 0, 9);
-					itemStacks = Arrays.copyOfRange(itemStacks, 9, itemStacks.length);
-					sortTargetType = ChatColor.GREEN + "inventory";
-					break;
-				}
+			
+			if (inventory instanceof PlayerInventory) {
+				hotbar = Arrays.copyOfRange(itemStacks, 0, 9);
+				itemStacks = Arrays.copyOfRange(itemStacks, 9, itemStacks.length);
+				sortTargetType = ChatColor.GREEN + "inventory";
 			}
-
+			
 			sender.sendMessage(Message.PREFIX + "Sorting " + sortTargetType + ChatColor.WHITE + "...");
 			try {
 				ArrayList<ItemStack> temp = new ArrayList<ItemStack>();
@@ -179,17 +154,16 @@ public class SortCommand implements CommandExecutor {
 					}
 				});
 
-				for (Inventory inventory : inventories) {
-					if (inventory instanceof PlayerInventory && itemStacks.length+hotbar.length == 36) {
+				
+				if (inventory instanceof PlayerInventory) {
+					if (itemStacks.length + hotbar.length == 36){
 						itemStacks = concat(hotbar, itemStacks);
-						inventory.setContents(itemStacks);
-						break;
 					} else {
-						ItemStack[] maxItems = Arrays.copyOfRange(itemStacks, 0, inventory.getSize());
-						itemStacks = Arrays.copyOfRange(itemStacks, inventory.getSize(), itemStacks.length);
-						inventory.setContents(maxItems);
+						return;
 					}
 				}
+				inventory.setContents(itemStacks);
+				
 				sender.sendMessage(Message.PREFIX
 						+ "Sorting "
 						+ sortTargetType
