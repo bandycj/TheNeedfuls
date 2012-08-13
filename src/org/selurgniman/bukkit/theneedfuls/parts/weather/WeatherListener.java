@@ -17,6 +17,7 @@ import org.selurgniman.bukkit.theneedfuls.TheNeedfuls;
  *         on: Dec 30, 2011
  */
 public class WeatherListener implements Listener {
+	public static final String ENABLED_KEY = "weather.enabled";
 	
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onBlockPistonExtend(BlockPistonExtendEvent event) {

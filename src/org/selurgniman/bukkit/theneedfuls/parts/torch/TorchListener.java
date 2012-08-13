@@ -26,7 +26,6 @@ import org.selurgniman.bukkit.theneedfuls.model.Model.CommandType;
  * Created on: Dec 30, 2011
  */
 public class TorchListener implements Listener {
-
 	private final Model pluginModel;
 	private final TorchModel torchModel;
 	

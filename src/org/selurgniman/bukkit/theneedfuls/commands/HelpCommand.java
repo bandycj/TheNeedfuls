@@ -72,9 +72,7 @@ public class HelpCommand extends AbstractCommand {
 		sender.sendMessage(subCommand.getUsage());
 	}
 
-	private enum HelpSubCommand
-			implements
-			ISubCommand {
+	private enum HelpSubCommand implements ISubCommand {
 		TORCH(
 				ChatColor.GREEN + "Help Torch: " + ChatColor.WHITE + "displays detailed help for the tnt command.",
 				"/tnh torch"),
